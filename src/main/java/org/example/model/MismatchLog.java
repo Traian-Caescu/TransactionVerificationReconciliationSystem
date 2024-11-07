@@ -1,4 +1,3 @@
-// src/main/java/org/example/model/MismatchLog.java
 package org.example.model;
 
 import javax.persistence.*;
@@ -6,16 +5,18 @@ import javax.persistence.*;
 @Entity
 @Table(name = "mismatch_logs")
 public class MismatchLog {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String transactionId;
-    private String field;
-    private String internalValue;
-    private String externalValue;
+    private String field;  // The field where the mismatch occurred (e.g., "price", "quantity")
+    private String internalValue;  // The value in our system
+    private String externalValue;  // The value from the external source
 
-    // Constructors
+    // Constructors, Getters, and Setters
+
     public MismatchLog() {}
 
     public MismatchLog(String transactionId, String field, String internalValue, String externalValue) {
@@ -25,7 +26,6 @@ public class MismatchLog {
         this.externalValue = externalValue;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

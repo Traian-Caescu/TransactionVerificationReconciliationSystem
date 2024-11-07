@@ -1,9 +1,14 @@
-// src/main/java/org/example/repository/TransactionRepository.java
 package org.example.repository;
 
 import org.example.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
+@Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
-    Transaction findByTransactionId(String transactionId);
+
+    // Custom method to find a transaction by its unique ID
+    Optional<Transaction> findByTransactionId(String transactionId);
 }

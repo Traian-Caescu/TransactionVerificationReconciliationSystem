@@ -1,4 +1,3 @@
-// src/main/java/org/example/model/Transaction.java
 package org.example.model;
 
 import javax.persistence.*;
@@ -6,6 +5,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "transactions")
 public class Transaction {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,10 +19,13 @@ public class Transaction {
     @Column(nullable = false)
     private int quantity;
 
-    private String uid;
+    @Column(nullable = false)
+    private String uid;  // UID of the trader
+
     private String status;
 
-    // Constructors
+    // Constructors, Getters, and Setters
+
     public Transaction() {}
 
     public Transaction(String transactionId, double price, int quantity, String uid, String status) {
@@ -33,7 +36,6 @@ public class Transaction {
         this.status = status;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
