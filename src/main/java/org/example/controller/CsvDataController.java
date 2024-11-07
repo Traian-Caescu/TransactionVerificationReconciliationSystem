@@ -1,20 +1,26 @@
 package org.example.controller;
 
 import org.example.service.CsvDataService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
+@RequestMapping("/data")
 public class CsvDataController {
 
-    @Autowired
-    private CsvDataService csvDataService;
+    private final CsvDataService csvDataService;
 
-    @GetMapping("/BTC-USD_stock_data.csv")
-    public String loadCsv(@RequestParam String fileName) {
-        csvDataService.loadDataFromCsv(fileName);
-        return "Data loaded successfully!";
+    public CsvDataController(CsvDataService csvDataService) {
+        this.csvDataService = csvDataService;
+    }
+
+    @GetMapping("/load")
+    public ResponseEntity<String> loadData() {
+        List<String[]> data = csvDataService.loadCsvData();
+        return ResponseEntity.ok("CSV data loaded successfully. Total rows: " + data.size());
     }
 }
