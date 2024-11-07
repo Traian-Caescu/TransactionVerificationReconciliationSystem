@@ -1,12 +1,10 @@
-package org.example.model;
+package org.example.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "stock_data")
 public class StockData {
 
     @Id
@@ -21,5 +19,50 @@ public class StockData {
     private Double adjClose;
     private Long volume;
 
-    // Getters and Setters
+    // Default constructor
+    public StockData() {}
+
+    // Parameterized constructor
+    public StockData(LocalDate date, Double open, Double high, Double low, Double close, Double adjClose, Long volume) {
+        this.date = date;
+        this.open = open;
+        this.high = high;
+        this.low = low;
+        this.close = close;
+        this.adjClose = adjClose;
+        this.volume = volume;
+    }
+
+    // Getters
+    public Long getId() {
+        return id;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public Double getOpen() {
+        return open;
+    }
+
+    public Double getHigh() {
+        return high;
+    }
+
+    public Double getLow() {
+        return low;
+    }
+
+    public Double getClose() {
+        return close;
+    }
+
+    public Double getAdjClose() {
+        return adjClose;
+    }
+
+    public Long getVolume() {
+        return volume;
+    }
 }

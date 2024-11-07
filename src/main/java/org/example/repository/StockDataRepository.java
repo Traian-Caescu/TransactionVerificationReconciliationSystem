@@ -1,6 +1,6 @@
 package org.example.repository;
 
-import org.example.model.StockData;
+import org.example.entity.StockData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

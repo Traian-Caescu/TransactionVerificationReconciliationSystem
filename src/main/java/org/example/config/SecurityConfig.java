@@ -15,31 +15,22 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // Define in-memory user credentials
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("password")
-                .roles("ADMIN")
-                .build());
-        manager.createUser(User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build());
+        manager.createUser(User.withDefaultPasswordEncoder().username("admin").password("password").roles("ADMIN").build());
+        manager.createUser(User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build());
         return manager;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()  // Disable CSRF for simplicity in this example
+                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/reconciliation/**").hasRole("ADMIN")  // Only admins can access reconciliation endpoints
-                .antMatchers("/api/transactions/**").hasAnyRole("ADMIN", "USER")  // Transactions accessible by both admin and user roles
-                .anyRequest().authenticated()  // All other requests need authentication
+                .antMatchers("/data/load").hasRole("ADMIN")
+                .antMatchers("/data/view").permitAll()
+                .anyRequest().authenticated()
                 .and()
-                .httpBasic();  // Use basic authentication for simplicity
+                .httpBasic();
 
         return http.build();
     }

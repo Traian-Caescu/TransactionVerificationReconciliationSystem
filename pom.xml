@@ -8,66 +8,43 @@
     <packaging>jar</packaging>
 
     <name>TransactionVerificationReconciliationSystem</name>
-    <description>Transaction Verification Reconciliation System</description>
 
-    <!-- Properties -->
     <properties>
         <java.version>11</java.version>
         <spring-boot.version>2.5.4</spring-boot.version>
     </properties>
 
-    <!-- Dependencies -->
     <dependencies>
-        <!-- Spring Boot Starter -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
             <version>5.5.2</version>
         </dependency>
-
-        <!-- Spring Boot Starter Data JPA (for database interaction) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
-
-        <!-- Spring Boot Starter Web (for building RESTful APIs) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
-
-        <!-- MySQL Connector (for MySQL database connectivity) -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.26</version> <!-- Use a specific version -->
-            <scope>runtime</scope>
+            <version>8.0.26</version>
         </dependency>
-
-        <!-- Spring Boot Starter Security (for security and authentication) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
-
-        <!-- Spring Boot Starter Thymeleaf (for JSP or HTML views) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
-            <version>${spring-boot.version}</version>
         </dependency>
-
-        <!-- Lombok (optional, for reducing boilerplate code) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -76,20 +53,12 @@
         </dependency>
     </dependencies>
 
-    <!-- Build Plugins -->
     <build>
         <plugins>
-            <!-- Spring Boot Maven Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-                <configuration>
-                    <mainClass>org.example.TransactionVerificationReconciliationSystemApplication</mainClass>
-                </configuration>
             </plugin>
-
-            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
