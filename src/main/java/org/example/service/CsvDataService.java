@@ -1,16 +1,11 @@
 package org.example.service;
 
-import com.opencsv.CSVReader;
 import org.example.entity.StockData;
 import org.example.repository.StockDataRepository;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CsvDataService {
@@ -49,7 +44,7 @@ public class CsvDataService {
     }
 
     // Method to retrieve all stock data for display
-    public List<StockData> getAllStockData() {
-        return stockDataRepository.findAll();
+    public List<StockData> getFilteredStockData(LocalDate startDate, LocalDate endDate, String sortBy, String order) {
+        return stockDataRepository.findByDateRangeAndSort(startDate, endDate, sortBy, order.equals("asc"));
     }
 }

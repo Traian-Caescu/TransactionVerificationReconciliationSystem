@@ -2,12 +2,11 @@ package org.example.controller;
 
 import org.example.entity.StockData;
 import org.example.service.CsvDataService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -21,15 +20,20 @@ public class CsvDataController {
     }
 
     @GetMapping("/load")
-    public ResponseEntity<String> loadData() {
-        String result = csvDataService.loadCsvData();
-        return ResponseEntity.ok(result);
+    public String loadData() {
+        csvDataService.loadCsvData();
+        return "redirect:/data/view";
     }
 
     @GetMapping("/view")
-    public String viewStockData(Model model) {
-        List<StockData> stockData = csvDataService.getAllStockData();
+    public String viewStockData(Model model,
+                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+                                @RequestParam(required = false, defaultValue = "date") String sortBy,
+                                @RequestParam(required = false, defaultValue = "asc") String order) {
+
+        List<StockData> stockData = csvDataService.getFilteredStockData(startDate, endDate, sortBy, order);
         model.addAttribute("stockData", stockData);
-        return "stockData"; // Ensure there's a 'stockData.html' template in 'src/main/resources/templates'
+        return "stockData";
     }
 }
