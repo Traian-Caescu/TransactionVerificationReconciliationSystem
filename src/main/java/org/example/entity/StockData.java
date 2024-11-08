@@ -19,10 +19,8 @@ public class StockData {
     private Double adjClose;
     private Long volume;
 
-    // Default constructor
     public StockData() {}
 
-    // Parameterized constructor
     public StockData(LocalDate date, Double open, Double high, Double low, Double close, Double adjClose, Long volume) {
         this.date = date;
         this.open = open;
