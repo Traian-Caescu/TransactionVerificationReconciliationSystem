@@ -8,14 +8,15 @@ import org.example.service.AlertService;
 import org.example.service.ExternalTransactionService;
 import org.example.service.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity; // Add this import
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+@Controller // Change this from RestController to Controller
 @RequestMapping("/api/reconciliation")
 public class ReconciliationController {
 
@@ -64,17 +65,12 @@ public class ReconciliationController {
 
     // New endpoint to view the most active options page
     @GetMapping("/viewActiveOptions")
-    public String viewActiveOptions(Model model) {
+    public String getActiveOptionsPage(Model model) {
         List<OptionDTO> activeOptions = externalTransactionService.fetchMostActiveOptions(); // Fetch active options
         System.out.println("Fetched Active Options: " + activeOptions); // Log the fetched options
         model.addAttribute("activeOptions", activeOptions); // Add to model
-        return "active-options"; // Return the view name
+        return "active-options"; // This matches your Thymeleaf template name
     }
-
-
-
-
-
 
     // Inner class to represent the verification response
     public static class VerificationResponse {

@@ -39,7 +39,10 @@ public class ExternalTransactionService {
                     apiUrl,
                     HttpMethod.GET,
                     entity,
-                    ResponseWrapper.class); // Ensure this class matches the API response structure
+                    ResponseWrapper.class);
+
+            // Log the response
+            System.out.println("Response from API: " + response.getBody());
 
             return response.getBody() != null ? response.getBody().getBody() : Collections.emptyList();
         } catch (RestClientException e) {
@@ -47,6 +50,7 @@ public class ExternalTransactionService {
             return Collections.emptyList(); // Return an empty list on error
         }
     }
+
 
 
     // Define a wrapper for the response to match the API response structure
