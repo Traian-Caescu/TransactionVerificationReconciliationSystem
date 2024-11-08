@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    // Custom method to find a transaction by its unique ID
+    // Custom method to find a transaction by its unique transaction ID
     Optional<Transaction> findByTransactionId(String transactionId);
 }

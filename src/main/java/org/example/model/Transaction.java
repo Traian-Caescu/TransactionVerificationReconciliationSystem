@@ -11,23 +11,23 @@ public class Transaction {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String transactionId;
+    private String transactionId; // Unique identifier for each transaction
 
     @Column(nullable = false)
-    private double price;
+    private double price; // Price of the transaction
 
     @Column(nullable = false)
-    private int quantity;
+    private int quantity; // Quantity involved in the transaction
 
     @Column(nullable = false)
-    private String uid;  // UID of the trader
+    private String uid; // UID of the trader
 
-    private String status;
+    private String status; // Status of the transaction (e.g., completed, pending)
 
-    // Constructors, Getters, and Setters
-
+    // Default constructor
     public Transaction() {}
 
+    // Parameterized constructor
     public Transaction(String transactionId, double price, int quantity, String uid, String status) {
         this.transactionId = transactionId;
         this.price = price;
@@ -36,6 +36,7 @@ public class Transaction {
         this.status = status;
     }
 
+    // Getters
     public Long getId() {
         return id;
     }
@@ -44,36 +45,37 @@ public class Transaction {
         return transactionId;
     }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
     public double getPrice() {
         return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
     public String getUid() {
         return uid;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
     public String getStatus() {
         return status;
+    }
+
+    // Setters
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public void setStatus(String status) {

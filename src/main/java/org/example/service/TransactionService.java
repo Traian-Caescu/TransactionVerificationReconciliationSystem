@@ -55,7 +55,7 @@ public class TransactionService {
         return transactionRepository.findAll();
     }
 
-    // Update transaction
+    // Update an existing transaction
     public Transaction updateTransaction(String transactionId, Transaction updatedTransaction) {
         return transactionRepository.findByTransactionId(transactionId)
                 .map(existingTransaction -> {
@@ -68,7 +68,7 @@ public class TransactionService {
                 .orElse(null);
     }
 
-    // Delete a transaction
+    // Delete a transaction by ID
     public boolean deleteTransaction(String transactionId) {
         Optional<Transaction> transaction = transactionRepository.findByTransactionId(transactionId);
         if (transaction.isPresent()) {

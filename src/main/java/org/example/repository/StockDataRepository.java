@@ -12,9 +12,11 @@ import java.util.List;
 @Repository
 public interface StockDataRepository extends JpaRepository<StockData, Long> {
 
+    // Custom method to find stock data by date range
     @Query("SELECT s FROM StockData s WHERE " +
             "(:startDate IS NULL OR s.date >= :startDate) AND " +
             "(:endDate IS NULL OR s.date <= :endDate)")
     List<StockData> findByDateRange(@Param("startDate") LocalDate startDate,
                                     @Param("endDate") LocalDate endDate);
+
 }

@@ -11,20 +11,28 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String action;  // Description of the action (e.g., "Transaction Verified", "Mismatch Detected")
+
+    @Column(nullable = false)
     private String details;  // Detailed information about the action
+
+    @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    // Constructors, Getters, and Setters
+    // Default constructor
+    public AuditLog() {
+        this.timestamp = LocalDateTime.now(); // Set timestamp to now by default
+    }
 
-    public AuditLog() {}
-
+    // Parameterized constructor
     public AuditLog(String action, String details) {
         this.action = action;
         this.details = details;
         this.timestamp = LocalDateTime.now();
     }
 
+    // Getters
     public Long getId() {
         return id;
     }
@@ -33,20 +41,21 @@ public class AuditLog {
         return action;
     }
 
-    public void setAction(String action) {
-        this.action = action;
-    }
-
     public String getDetails() {
         return details;
     }
 
-    public void setDetails(String details) {
-        this.details = details;
-    }
-
     public LocalDateTime getTimestamp() {
         return timestamp;
+    }
+
+    // Setters
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 
     public void setTimestamp(LocalDateTime timestamp) {

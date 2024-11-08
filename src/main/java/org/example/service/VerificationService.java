@@ -35,7 +35,7 @@ public class VerificationService {
         this.mismatchLogRepository = mismatchLogRepository;
     }
 
-    // Verify transactions across multiple sources and log any mismatches
+    // Verify transactions against external sources and log any mismatches
     public void verifyTransactions(List<Transaction> externalTransactions, String source) {
         for (Transaction externalTransaction : externalTransactions) {
             Optional<Transaction> internalTransactionOpt = transactionRepository.findByTransactionId(externalTransaction.getTransactionId());
@@ -61,7 +61,7 @@ public class VerificationService {
         }
     }
 
-    // Helper to log mismatches, including the source for each mismatch
+    // Helper to log mismatches
     private void logMismatch(String transactionId, String field, String internalValue, String externalValue, String source) {
         MismatchLog mismatchLog = new MismatchLog(transactionId, field, internalValue, externalValue, source);
         mismatchLogRepository.save(mismatchLog);
@@ -85,7 +85,7 @@ public class VerificationService {
         return mismatchLogRepository.findAll();
     }
 
-    // Generate a detailed mismatch report, providing a breakdown by source
+    // Generate a detailed mismatch report
     public void generateDetailedMismatchReport() {
         List<MismatchLog> mismatches = getAllMismatches();
         mismatches.forEach(mismatch -> System.out.println("Mismatch Report - Transaction ID: " + mismatch.getTransactionId()
