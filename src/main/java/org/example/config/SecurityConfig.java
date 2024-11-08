@@ -16,8 +16,8 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withDefaultPasswordEncoder().username("admin").password("password").roles("ADMIN").build());
-        manager.createUser(User.withDefaultPasswordEncoder().username("user").password("password").roles("USER").build());
+        manager.createUser(User.withDefaultPasswordEncoder().username("admin").password("adminpassword").roles("ADMIN").build());
+        manager.createUser(User.withDefaultPasswordEncoder().username("user").password("userpassword").roles("USER").build());
         return manager;
     }
 
@@ -26,8 +26,8 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/data/load").hasRole("ADMIN")
-                .antMatchers("/data/view").permitAll()
+                .antMatchers("/data/load", "/api/reconciliation/**").hasRole("ADMIN")
+                .antMatchers("/data/view", "/api/transactions/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();

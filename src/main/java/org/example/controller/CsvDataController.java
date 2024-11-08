@@ -4,7 +4,6 @@ import org.example.entity.StockData;
 import org.example.service.CsvDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,15 +23,15 @@ public class CsvDataController {
         this.csvDataService = csvDataService;
     }
 
-    // Load CSV Data into Database
+    // Endpoint to load CSV data into the database
     @GetMapping("/load")
     public ResponseEntity<String> loadData() {
         String result = csvDataService.loadCsvData();
         return ResponseEntity.ok(result);
     }
 
-    // Get filtered stock data
-    @GetMapping
+    // Endpoint to retrieve filtered stock data with optional date range and sorting
+    @GetMapping("/view")
     public ResponseEntity<List<StockData>> getStockData(
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
