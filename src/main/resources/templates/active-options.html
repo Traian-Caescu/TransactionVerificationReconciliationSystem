@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Active Options</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+<h1>Active Options</h1>
+<table>
+  <thead>
+  <tr>
+    <th>Symbol</th>
+    <th>Last Price</th>
+    <th>Price Change</th>
+    <th>Volume</th>
+    <th>Has Options</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="option : ${activeOptions}">
+    <td th:text="${option.symbol}"></td>
+    <td th:text="${option.lastPrice}"></td>
+    <td th:text="${option.priceChange}"></td>
+    <td th:text="${option.optionsTotalVolume}"></td>
+    <td th:text="${option.hasOptions}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

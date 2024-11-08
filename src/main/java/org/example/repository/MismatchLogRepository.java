@@ -11,4 +11,7 @@ public interface MismatchLogRepository extends JpaRepository<MismatchLog, Long> 
 
     // Custom method to find mismatches by transaction ID
     List<MismatchLog> findByTransactionId(String transactionId);
+
+    // Additional method to find mismatches by source
+    List<MismatchLog> findBySource(String source);
 }

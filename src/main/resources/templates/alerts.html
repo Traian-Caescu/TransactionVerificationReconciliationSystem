@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Transaction Mismatch Alerts</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+<h1>Transaction Mismatch Alerts</h1>
+<div>
+  <h2>Alerts</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>Transaction ID</th>
+      <th>Field</th>
+      <th>Internal Value</th>
+      <th>External Value</th>
+      <th>Source</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="alert : ${alerts}">
+      <td th:text="${alert.transactionId}"></td>
+      <td th:text="${alert.field}"></td>
+      <td th:text="${alert.internalValue}"></td>
+      <td th:text="${alert.externalValue}"></td>
+      <td th:text="${alert.source}"></td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
