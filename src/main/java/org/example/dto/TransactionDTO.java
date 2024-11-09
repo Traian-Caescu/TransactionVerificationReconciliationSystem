@@ -1,28 +1,16 @@
 package org.example.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-
 public class TransactionDTO {
-
-    @NotBlank(message = "Transaction ID is mandatory")
     private String transactionId;
-
-    @NotNull(message = "Price is mandatory")
-    private Double price;
-
-    @NotNull(message = "Quantity is mandatory")
-    private Integer quantity;
-
-    @NotBlank(message = "UID is mandatory")
+    private double price;
+    private int quantity;
     private String uid;
-
     private String status;
 
-    // Constructors
+    // Constructor
     public TransactionDTO() {}
 
-    public TransactionDTO(String transactionId, Double price, Integer quantity, String uid, String status) {
+    public TransactionDTO(String transactionId, double price, int quantity, String uid, String status) {
         this.transactionId = transactionId;
         this.price = price;
         this.quantity = quantity;
@@ -39,19 +27,19 @@ public class TransactionDTO {
         this.transactionId = transactionId;
     }
 
-    public Double getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
-    public Integer getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 

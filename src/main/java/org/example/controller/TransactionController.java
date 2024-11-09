@@ -5,6 +5,7 @@ import org.example.model.Transaction;
 import org.example.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,15 @@ public class TransactionController {
     // Endpoint to create a new transaction
     @PostMapping
     public ResponseEntity<Transaction> createTransaction(@RequestBody TransactionDTO transactionDTO) {
+        // Log the entire DTO
+        System.out.println("Received transactionDTO: " + transactionDTO);
+
+        // Validate individual fields
+        if (transactionDTO.getTransactionId() == null || transactionDTO.getTransactionId().isEmpty()) {
+            System.out.println("Error: Transaction ID is null or empty.");
+            return ResponseEntity.badRequest().body(null); // Return a bad request response
+        }
+
         Transaction transaction = new Transaction(
                 transactionDTO.getTransactionId(),
                 transactionDTO.getPrice(),
@@ -31,7 +41,16 @@ public class TransactionController {
                 transactionDTO.getUid(),
                 transactionDTO.getStatus()
         );
+
+        // Log transaction details before saving
+        System.out.println("Creating transaction with ID: " + transaction.getTransactionId());
+
+        // Attempt to save the transaction
         Transaction savedTransaction = transactionService.saveTransaction(transaction);
+        if (savedTransaction == null) {
+            System.out.println("Error: Transaction could not be saved.");
+            return ResponseEntity.badRequest().body(null); // If null is returned, handle as needed
+        }
         return ResponseEntity.ok(savedTransaction);
     }
 
@@ -47,13 +66,15 @@ public class TransactionController {
     @GetMapping
     public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
         List<Transaction> transactions = transactionService.getAllTransactions();
-        List<TransactionDTO> transactionDTOs = transactions.stream().map(transaction -> new TransactionDTO(
-                transaction.getTransactionId(),
-                transaction.getPrice(),
-                transaction.getQuantity(),
-                transaction.getUid(),
-                transaction.getStatus()
-        )).collect(Collectors.toList());
+        List<TransactionDTO> transactionDTOs = transactions.stream()
+                .map(transaction -> new TransactionDTO(
+                        transaction.getTransactionId(),
+                        transaction.getPrice(),
+                        transaction.getQuantity(),
+                        transaction.getUid(),
+                        transaction.getStatus()
+                ))
+                .collect(Collectors.toList());
         return ResponseEntity.ok(transactionDTOs);
     }
 
@@ -61,7 +82,7 @@ public class TransactionController {
     @PutMapping("/{transactionId}")
     public ResponseEntity<Transaction> updateTransaction(
             @PathVariable String transactionId,
-            @RequestBody TransactionDTO transactionDTO) {
+            @Validated @RequestBody TransactionDTO transactionDTO) {
         Transaction updatedTransaction = new Transaction(
                 transactionDTO.getTransactionId(),
                 transactionDTO.getPrice(),
@@ -69,6 +90,7 @@ public class TransactionController {
                 transactionDTO.getUid(),
                 transactionDTO.getStatus()
         );
+
         Transaction result = transactionService.updateTransaction(transactionId, updatedTransaction);
         return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
     }

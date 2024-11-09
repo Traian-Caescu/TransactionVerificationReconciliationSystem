@@ -17,7 +17,6 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AlertService alertService;
 
-    // Thresholds for validation
     @Value("${transaction.price.min:10}")
     private double minPrice;
 
@@ -35,10 +34,13 @@ public class TransactionService {
         this.alertService = alertService;
     }
 
-    // Save a new transaction with pre-execution validation
     public Transaction saveTransaction(Transaction transaction) {
-        boolean isValid = validateTransactionPreExecution(transaction);
+        if (transaction.getTransactionId() == null || transaction.getTransactionId().isEmpty()) {
+            alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction ID cannot be null or empty.");
+            return null;
+        }
 
+        boolean isValid = validateTransactionPreExecution(transaction);
         if (isValid) {
             return transactionRepository.save(transaction);
         } else {
@@ -46,18 +48,15 @@ public class TransactionService {
             return null;
         }
     }
-
-    // Retrieve a transaction by ID
+ 
     public Optional<Transaction> getTransactionById(String transactionId) {
         return transactionRepository.findByTransactionId(transactionId);
     }
 
-    // Retrieve all transactions
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
 
-    // Update an existing transaction
     public Transaction updateTransaction(String transactionId, Transaction updatedTransaction) {
         return transactionRepository.findByTransactionId(transactionId)
                 .map(existingTransaction -> {
@@ -70,7 +69,6 @@ public class TransactionService {
                 .orElse(null);
     }
 
-    // Delete a transaction by ID
     public boolean deleteTransaction(String transactionId) {
         Optional<Transaction> transaction = transactionRepository.findByTransactionId(transactionId);
         if (transaction.isPresent()) {
@@ -80,19 +78,14 @@ public class TransactionService {
         return false;
     }
 
-    // Pre-execution validation for fat finger errors and range checks
     private boolean validateTransactionPreExecution(Transaction transaction) {
         boolean isValid = ValidationUtil.validateTransactionRange(transaction, minPrice, maxPrice, minQuantity, maxQuantity);
-
         if (!isValid) {
-            System.out.println("Alert: Potential input error for transaction ID " + transaction.getTransactionId() +
-                    ". Check price and quantity ranges before execution.");
+            System.out.println("Alert: Potential input error for transaction ID " + transaction.getTransactionId());
         }
-
         return isValid;
     }
 
-    // Track mismatches with an external data source
     public List<TransactionMismatch> trackMismatches(List<Transaction> externalTransactions) {
         List<TransactionMismatch> mismatches = new ArrayList<>();
 
@@ -101,18 +94,17 @@ public class TransactionService {
 
             if (internalTransactionOpt.isPresent()) {
                 Transaction internalTransaction = internalTransactionOpt.get();
-                if (!internalTransaction.equals(externalTransaction)) { // Ensure equals method is implemented
+                if (!internalTransaction.equals(externalTransaction)) {
                     mismatches.add(createMismatch(internalTransaction, externalTransaction));
                 }
             } else {
-                mismatches.add(createMismatch(null, externalTransaction)); // Transaction not found in internal records
+                mismatches.add(createMismatch(null, externalTransaction));
             }
         }
 
         return mismatches;
     }
 
-    // Create a TransactionMismatch object
     private TransactionMismatch createMismatch(Transaction internalTransaction, Transaction externalTransaction) {
         TransactionMismatch mismatch = new TransactionMismatch();
         mismatch.setTransactionId(externalTransaction.getTransactionId());
@@ -128,7 +120,6 @@ public class TransactionService {
                 mismatch.setInternalValue(String.valueOf(internalTransaction.getQuantity()));
                 mismatch.setExternalValue(String.valueOf(externalTransaction.getQuantity()));
             }
-            // Add checks for other fields as needed
         } else {
             mismatch.setField("Not Found");
             mismatch.setInternalValue("N/A");
