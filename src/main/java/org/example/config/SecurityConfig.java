@@ -15,10 +15,18 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withDefaultPasswordEncoder().username("admin").password("adminpassword").roles("ADMIN").build());
-        manager.createUser(User.withDefaultPasswordEncoder().username("user").password("userpassword").roles("USER").build());
-        return manager;
+        return new InMemoryUserDetailsManager(
+                User.withDefaultPasswordEncoder()
+                        .username("admin")
+                        .password("adminpassword")
+                        .roles("ADMIN")
+                        .build(),
+                User.withDefaultPasswordEncoder()
+                        .username("user")
+                        .password("userpassword")
+                        .roles("USER")
+                        .build()
+        );
     }
 
     @Bean
@@ -26,12 +34,12 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests()
+                .antMatchers("/api/authenticate").permitAll()
                 .antMatchers("/data/load", "/api/reconciliation/**").hasRole("ADMIN")
                 .antMatchers("/data/view", "/api/transactions/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();
-
         return http.build();
     }
 }
