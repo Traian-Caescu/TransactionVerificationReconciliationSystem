@@ -1,73 +1,104 @@
 package org.example.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.dto.OptionDTO;
+import org.example.model.Transaction;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.RestClientException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpMethod;
 
-import java.util.Collections;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ExternalTransactionService {
 
-    private final RestTemplate restTemplate;
-
     @Value("${yahoo.finance.api.key}")
     private String apiKey;
 
-    public ExternalTransactionService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+
+    public ExternalTransactionService() {
+        this.restTemplate = new RestTemplate();
+        this.objectMapper = new ObjectMapper();
     }
 
-    // Fetch most active stock options from external API with error handling
+    // Fetch the most active options from Yahoo Finance API
     public List<OptionDTO> fetchMostActiveOptions() {
-        String apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/options/most-active?type=STOCKS";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("x-rapidapi-host", "yahoo-finance15.p.rapidapi.com");
-        headers.set("x-rapidapi-key", apiKey);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        String url = "https://yfapi.net/v6/finance/quote/marketSummary";
+        List<OptionDTO> options = new ArrayList<>();
 
         try {
-            ResponseEntity<ResponseWrapper> response = restTemplate.exchange(
-                    apiUrl,
-                    HttpMethod.GET,
-                    entity,
-                    ResponseWrapper.class);
+            String response = restTemplate.getForObject(url + "?apikey=" + apiKey, String.class);
+            JsonNode root = objectMapper.readTree(response);
 
-            System.out.println("Response from API: " + response.getBody());
-            return response.getBody() != null ? response.getBody().getBody() : Collections.emptyList();
-        } catch (RestClientException e) {
-            System.err.println("Error fetching most active options: " + e.getMessage());
-            return Collections.emptyList(); // Return empty list on error to prevent system disruption
+            for (JsonNode optionNode : root.path("result")) {
+                OptionDTO option = new OptionDTO();
+                option.setSymbol(optionNode.path("symbol").asText());
+                option.setPrice(optionNode.path("regularMarketPrice").asDouble());
+                option.setChange(optionNode.path("regularMarketChange").asDouble());
+                option.setVolume(optionNode.path("regularMarketVolume").asLong());
+                options.add(option);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        return options;
     }
 
-    // Wrapper to match the API response structure for deserialization
-    public static class ResponseWrapper {
-        private String status;
-        private List<OptionDTO> body;
+    // Fetch stock data for specific symbols from Yahoo Finance API
+    public List<OptionDTO> fetchStockData(List<String> symbols) {
+        List<OptionDTO> stockData = new ArrayList<>();
+        String symbolQuery = String.join(",", symbols);
+        String url = "https://yfapi.net/v7/finance/quote?symbols=" + symbolQuery + "&apikey=" + apiKey;
 
-        public String getStatus() {
-            return status;
+        try {
+            String response = restTemplate.getForObject(url, String.class);
+            JsonNode root = objectMapper.readTree(response);
+
+            for (JsonNode stockNode : root.path("quoteResponse").path("result")) {
+                OptionDTO stock = new OptionDTO();
+                stock.setSymbol(stockNode.path("symbol").asText());
+                stock.setPrice(stockNode.path("regularMarketPrice").asDouble());
+                stock.setChange(stockNode.path("regularMarketChange").asDouble());
+                stock.setVolume(stockNode.path("regularMarketVolume").asLong());
+                stock.setMarketCap(stockNode.path("marketCap").asLong());
+                stock.setPeRatio(stockNode.path("trailingPE").asDouble());
+                stockData.add(stock);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        public void setStatus(String status) {
-            this.status = status;
+        return stockData;
+    }
+
+    // Compare transaction prices with stock prices from Yahoo Finance
+    public List<String> compareWithStockData(List<Transaction> transactions) {
+        List<String> mismatches = new ArrayList<>();
+        List<String> symbols = new ArrayList<>();
+
+        for (Transaction transaction : transactions) {
+            symbols.add(transaction.getSymbol());
         }
 
-        public List<OptionDTO> getBody() {
-            return body;
+        List<OptionDTO> stockData = fetchStockData(symbols);
+
+        for (Transaction transaction : transactions) {
+            for (OptionDTO stock : stockData) {
+                if (transaction.getSymbol().equals(stock.getSymbol()) &&
+                        transaction.getPrice() != stock.getPrice()) {
+                    mismatches.add("Mismatch for symbol " + transaction.getSymbol() +
+                            ": Transaction price = " + transaction.getPrice() +
+                            ", Stock price = " + stock.getPrice());
+                }
+            }
         }
 
-        public void setBody(List<OptionDTO> body) {
-            this.body = body;
-        }
+        return mismatches;
     }
 }

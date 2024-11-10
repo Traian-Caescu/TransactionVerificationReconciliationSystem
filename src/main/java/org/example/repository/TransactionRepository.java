@@ -22,4 +22,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findByQuantityBetween(int minQuantity, int maxQuantity);
 
     Optional<Transaction> findByTransactionId(String transactionId);
+    Optional<Transaction> findBySymbol(String symbol);
+
 }

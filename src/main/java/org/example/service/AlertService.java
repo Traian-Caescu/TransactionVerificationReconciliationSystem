@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.model.MismatchLog;
 import org.example.repository.MismatchLogRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,58 +13,52 @@ public class AlertService {
 
     private final MismatchLogRepository mismatchLogRepository;
 
+    @Autowired
     public AlertService(MismatchLogRepository mismatchLogRepository) {
         this.mismatchLogRepository = mismatchLogRepository;
     }
 
-    // Generate alerts based on mismatches recorded in the system
-    public void generateAlerts(List<MismatchLog> mismatches) {
-        mismatches.forEach(mismatch -> {
-            String alertMessage = String.format("Mismatch detected in %s for Transaction ID %s. Internal Value: %s, External Value: %s, Source: %s",
-                    mismatch.getField(), mismatch.getTransactionId(), mismatch.getInternalValue(), mismatch.getExternalValue(), mismatch.getSource());
-            sendAlert(alertMessage);
-        });
-    }
-
-    // Fetch all mismatches from the repository and generate alerts
-    public void generateAllMismatchAlerts() {
-        List<MismatchLog> mismatches = mismatchLogRepository.findAll();
-        generateAlerts(mismatches);
-    }
-
-    // Pre-execution alert for potential errors based on out-of-bound transaction values
-    public void preExecutionAlert(String transactionId, String alertMessage) {
-        String formattedMessage = String.format("Pre-execution Alert for Transaction ID %s: %s", transactionId, alertMessage);
-        sendAlert(formattedMessage);
-    }
-
-    // Generate mismatch summary report to provide an overview of all discrepancies
-    public void generateMismatchSummaryReport() {
-        List<MismatchLog> mismatches = mismatchLogRepository.findAll();
-        System.out.println("==== Mismatch Summary Report ====");
-        mismatches.forEach(mismatch -> System.out.println(
-                "Transaction ID: " + mismatch.getTransactionId() +
-                        ", Field: " + mismatch.getField() +
-                        ", Internal Value: " + mismatch.getInternalValue() +
-                        ", External Value: " + mismatch.getExternalValue() +
-                        ", Source: " + mismatch.getSource()
-        ));
-    }
-
-    // Generate specific alerts for a given transaction ID
+    // Generate alerts for a specific transaction ID, including Yahoo Finance comparison alerts
     public List<String> generateAlertsForTransaction(String transactionId) {
         List<MismatchLog> mismatches = mismatchLogRepository.findByTransactionId(transactionId);
-        return mismatches.stream().map(mismatch -> {
-            String alertMessage = String.format("Mismatch in %s for Transaction ID %s. Internal Value: %s, External Value: %s, Source: %s",
-                    mismatch.getField(), mismatch.getTransactionId(), mismatch.getInternalValue(), mismatch.getExternalValue(), mismatch.getSource());
-            sendAlert(alertMessage);
-            return alertMessage;
-        }).collect(Collectors.toList());
+        return mismatches.stream()
+                .map(mismatch -> "Alert: " + mismatch.getDescription() + " | Field: " + mismatch.getField() +
+                        " | Expected: " + mismatch.getInternalValue() + " | Found: " + mismatch.getExternalValue() +
+                        " | Source: " + mismatch.getSource())
+                .collect(Collectors.toList());
     }
 
-    // Helper method to simulate sending an alert, could be replaced with actual email or notification logic
-    private void sendAlert(String alertMessage) {
-        System.out.println("ALERT: " + alertMessage);
-        // Placeholder for real alert/notification logic, such as sending an email or notification
+    // Fetch all mismatches and compile alerts for admin reporting
+    public List<String> generateAdminAlerts() {
+        List<MismatchLog> allMismatches = mismatchLogRepository.findAll();
+        return allMismatches.stream()
+                .map(mismatch -> "Admin Alert: Transaction ID " + mismatch.getTransactionId() + " | " + mismatch.getDescription() +
+                        " | Field: " + mismatch.getField() +
+                        " | Internal: " + mismatch.getInternalValue() +
+                        " | External: " + mismatch.getExternalValue() +
+                        " | Source: " + mismatch.getSource())
+                .collect(Collectors.toList());
+    }
+
+    // Generate summary of all mismatches, categorized by source for the report
+    public String generateMismatchSummary() {
+        List<MismatchLog> allMismatches = mismatchLogRepository.findAll();
+        StringBuilder summary = new StringBuilder("=== Mismatch Summary ===\n");
+
+        allMismatches.forEach(mismatch -> summary.append("Transaction ID: ")
+                .append(mismatch.getTransactionId())
+                .append(" | Field: ").append(mismatch.getField())
+                .append(" | Internal: ").append(mismatch.getInternalValue())
+                .append(" | External: ").append(mismatch.getExternalValue())
+                .append(" | Source: ").append(mismatch.getSource())
+                .append(" | Description: ").append(mismatch.getDescription())
+                .append("\n"));
+
+        return summary.toString();
+    }
+
+    // Generate pre-execution alert for transaction validation failures
+    public void preExecutionAlert(String transactionId, String message) {
+        System.out.println("Pre-Execution Alert: Transaction ID " + transactionId + " - " + message);
     }
 }

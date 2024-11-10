@@ -32,7 +32,8 @@ public class TransactionController {
                 transactionDTO.getUid(),
                 transactionDTO.getPrice(),
                 transactionDTO.getQuantity(),
-                transactionDTO.getStatus()
+                transactionDTO.getStatus(),
+                transactionDTO.getSymbol()
         );
 
         if (!transactionService.validateTransactionPreExecution(transaction)) {
@@ -65,7 +66,8 @@ public class TransactionController {
                         transaction.getPrice(),
                         transaction.getQuantity(),
                         transaction.getUid(),
-                        transaction.getStatus()
+                        transaction.getStatus(),
+                        transaction.getSymbol()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(transactionDTOs);
@@ -82,7 +84,8 @@ public class TransactionController {
                 transactionDTO.getUid(),
                 transactionDTO.getPrice(),
                 transactionDTO.getQuantity(),
-                transactionDTO.getStatus()
+                transactionDTO.getStatus(),
+                transactionDTO.getSymbol()
         );
 
         if (!transactionService.validateTransactionPreExecution(updatedTransaction)) {

@@ -31,16 +31,28 @@ public class Transaction {
 
     private String assetClass; // Optional field for asset class tracking
     private String strategy; // Optional field for trading strategy
+    private String symbol; // Optional field for compatibility with Yahoo Finance data
 
-    // Constructors
+    // Default constructor
     public Transaction() {}
 
+    // Constructor without symbol field
     public Transaction(String transactionId, String uid, double price, int quantity, String status) {
         this.transactionId = transactionId;
         this.uid = uid;
         this.price = price;
         this.quantity = quantity;
         this.status = status;
+    }
+
+    // Constructor with symbol field
+    public Transaction(String transactionId, String uid, double price, int quantity, String status, String symbol) {
+        this.transactionId = transactionId;
+        this.uid = uid;
+        this.price = price;
+        this.quantity = quantity;
+        this.status = status;
+        this.symbol = symbol;
     }
 
     // Getters and Setters
@@ -98,5 +110,13 @@ public class Transaction {
 
     public void setStrategy(String strategy) {
         this.strategy = strategy;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 }

@@ -22,8 +22,10 @@ public class OptionDTO {
     private double lastPrice;
 
     private double priceChange;
-
     private String percentChange;
+    private long volume;
+    private long marketCap;
+    private double peRatio;
 
     @NotBlank(message = "Options total volume is required")
     private String optionsTotalVolume;
@@ -121,6 +123,46 @@ public class OptionDTO {
         this.optionsCallVolumePercent = optionsCallVolumePercent;
     }
 
+    public long getVolume() {
+        return volume;
+    }
+
+    public void setVolume(long volume) {
+        this.volume = volume;
+    }
+
+    public long getMarketCap() {
+        return marketCap;
+    }
+
+    public void setMarketCap(long marketCap) {
+        this.marketCap = marketCap;
+    }
+
+    public double getPeRatio() {
+        return peRatio;
+    }
+
+    public void setPeRatio(double peRatio) {
+        this.peRatio = peRatio;
+    }
+
+    public double getPrice() {
+        return lastPrice;
+    }
+
+    public void setPrice(double price) {
+        this.lastPrice = price;
+    }
+
+    public double getChange() {
+        return priceChange;
+    }
+
+    public void setChange(double change) {
+        this.priceChange = change;
+    }
+
     // Override toString() method for better logging
     @Override
     public String toString() {
@@ -132,6 +174,9 @@ public class OptionDTO {
                 ", lastPrice=" + lastPrice +
                 ", priceChange=" + priceChange +
                 ", percentChange='" + percentChange + '\'' +
+                ", volume=" + volume +
+                ", marketCap=" + marketCap +
+                ", peRatio=" + peRatio +
                 ", optionsTotalVolume='" + optionsTotalVolume + '\'' +
                 ", optionsCallVolumePercent='" + optionsCallVolumePercent + '\'' +
                 '}';

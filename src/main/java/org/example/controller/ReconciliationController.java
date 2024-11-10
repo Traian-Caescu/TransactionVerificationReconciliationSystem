@@ -8,17 +8,21 @@ import org.example.service.AlertService;
 import org.example.service.ExternalTransactionService;
 import org.example.service.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/reconciliation")
 public class ReconciliationController {
+
+    private static final Logger LOGGER = Logger.getLogger(ReconciliationController.class.getName());
 
     private final VerificationService verificationService;
     private final AlertService alertService;
@@ -31,63 +35,98 @@ public class ReconciliationController {
         this.externalTransactionService = externalTransactionService;
     }
 
-    // Endpoint to verify transactions against external data sources
-    @PostMapping("/verify")
-    public ResponseEntity<VerificationResponse> verifyTransactions(@RequestBody List<TransactionDTO> externalTransactions) {
+    // Admin endpoint to verify transactions with Yahoo Finance data integration
+    @PostMapping("/admin/verify")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<VerificationResponse> verifyTransactionsAdmin(@RequestBody List<TransactionDTO> externalTransactions) {
         List<Transaction> transactions = externalTransactions.stream()
-                .map(dto -> new Transaction(dto.getTransactionId(), dto.getUid(), dto.getPrice(), dto.getQuantity(), dto.getStatus()))
+                .map(dto -> new Transaction(
+                        dto.getTransactionId(),
+                        dto.getUid(),
+                        dto.getPrice().doubleValue(),  // Cast to primitive double
+                        dto.getQuantity().intValue(),  // Cast to primitive int
+                        dto.getStatus(),
+                        dto.getSymbol()))
                 .collect(Collectors.toList());
 
         List<MismatchLog> mismatches = verificationService.verifyTransactions(transactions, "external_source");
+        List<String> stockMismatches = externalTransactionService.compareWithStockData(transactions);
 
         VerificationResponse response = new VerificationResponse();
-        response.setMessage(mismatches.isEmpty() ? "Verification complete. No mismatches detected." : "Verification complete. Mismatches detected.");
+        response.setMessage(mismatches.isEmpty() && stockMismatches.isEmpty() ? "Verification complete. No mismatches detected." : "Verification complete. Mismatches detected.");
         response.setMismatches(mismatches);
+        response.setStockMismatches(stockMismatches);
+
+        LOGGER.log(Level.INFO, "Admin transaction verification complete with {0} mismatches.", mismatches.size() + stockMismatches.size());
 
         return ResponseEntity.ok(response);
     }
 
-    // Endpoint to fetch and display most active options from external service
-    @GetMapping("/active-options")
-    public ResponseEntity<List<OptionDTO>> getMostActiveOptions() {
-        List<OptionDTO> activeOptions = externalTransactionService.fetchMostActiveOptions();
-        return ResponseEntity.ok(activeOptions);
+    // User endpoint for simpler verification without stock data
+    @PostMapping("/user/verify")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<VerificationResponse> verifyTransactionsUser(@RequestBody List<TransactionDTO> externalTransactions) {
+        List<Transaction> transactions = externalTransactions.stream()
+                .map(dto -> new Transaction(
+                        dto.getTransactionId(),
+                        dto.getUid(),
+                        dto.getPrice().doubleValue(),  // Cast to primitive double
+                        dto.getQuantity().intValue(),  // Cast to primitive int
+                        dto.getStatus()))
+                .collect(Collectors.toList());
+
+        List<MismatchLog> mismatches = verificationService.verifyTransactions(transactions, "user_source");
+
+        VerificationResponse response = new VerificationResponse();
+        response.setMessage(mismatches.isEmpty() ? "User verification complete. No mismatches detected." : "User verification complete. Mismatches detected.");
+        response.setMismatches(mismatches);
+
+        LOGGER.log(Level.INFO, "User transaction verification complete with {0} mismatches.", mismatches.size());
+
+        return ResponseEntity.ok(response);
     }
 
-    // View to display transaction mismatch alerts on the frontend
-    @GetMapping("/viewAlerts")
-    public ResponseEntity<List<MismatchLog>> viewAlerts() {
-        List<MismatchLog> mismatches = verificationService.getAllMismatches();
-        return ResponseEntity.ok(mismatches);
-    }
 
-
-    // View to display the most active options on the frontend
-    @GetMapping("/viewActiveOptions")
-    public ResponseEntity<List<OptionDTO>> getActiveOptionsPage() {
-        List<OptionDTO> activeOptions = externalTransactionService.fetchMostActiveOptions();
-        return ResponseEntity.ok(activeOptions);
-    }
-
-
-    // Endpoint to generate a detailed mismatch summary report
-    @GetMapping("/mismatch-report")
+    // Admin-only endpoint for generating a detailed mismatch report
+    @GetMapping("/admin/mismatch-report")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> generateMismatchReport() {
         verificationService.generateDetailedMismatchReport();
+        LOGGER.log(Level.INFO, "Mismatch report generated.");
         return ResponseEntity.ok("Mismatch report generated in logs.");
     }
 
-    // Endpoint to retrieve all mismatch alerts related to a specific transaction ID
-    @GetMapping("/alerts/{transactionId}")
+    // Open endpoint to fetch most active options from Yahoo Finance
+    @GetMapping("/active-options")
+    public ResponseEntity<List<OptionDTO>> getMostActiveOptions() {
+        List<OptionDTO> activeOptions = externalTransactionService.fetchMostActiveOptions();
+        LOGGER.log(Level.INFO, "Most active options fetched from Yahoo Finance.");
+        return ResponseEntity.ok(activeOptions);
+    }
+
+    // User-specific endpoint to retrieve alerts for a specific transaction
+    @GetMapping("/user/alerts/{transactionId}")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<String>> getAlertsForTransaction(@PathVariable String transactionId) {
         List<String> alerts = alertService.generateAlertsForTransaction(transactionId);
+        LOGGER.log(Level.INFO, "Alerts retrieved for transaction ID: {0}", transactionId);
         return alerts.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(alerts);
+    }
+
+    // Admin-only endpoint to retrieve all mismatch alerts
+    @GetMapping("/admin/alerts")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<MismatchLog>> getAllAlerts() {
+        List<MismatchLog> mismatches = verificationService.getAllMismatches();
+        LOGGER.log(Level.INFO, "All mismatch alerts retrieved.");
+        return ResponseEntity.ok(mismatches);
     }
 
     // Inner class to represent the verification response structure
     public static class VerificationResponse {
         private String message;
         private List<MismatchLog> mismatches;
+        private List<String> stockMismatches;
 
         // Getters and Setters
         public String getMessage() {
@@ -104,6 +143,14 @@ public class ReconciliationController {
 
         public void setMismatches(List<MismatchLog> mismatches) {
             this.mismatches = mismatches;
+        }
+
+        public List<String> getStockMismatches() {
+            return stockMismatches;
+        }
+
+        public void setStockMismatches(List<String> stockMismatches) {
+            this.stockMismatches = stockMismatches;
         }
     }
 }

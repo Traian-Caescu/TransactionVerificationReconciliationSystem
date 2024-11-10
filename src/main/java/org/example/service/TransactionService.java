@@ -3,6 +3,7 @@ package org.example.service;
 import org.example.model.Transaction;
 import org.example.repository.TransactionRepository;
 import org.example.util.ValidationUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,12 +29,13 @@ public class TransactionService {
     @Value("${transaction.quantity.max:1000}")
     private int maxQuantity;
 
+    @Autowired
     public TransactionService(TransactionRepository transactionRepository, AlertService alertService) {
         this.transactionRepository = transactionRepository;
         this.alertService = alertService;
     }
 
-    // Save a new transaction with validation
+    // Save a new transaction with validation and alerting
     public Transaction saveTransaction(Transaction transaction) {
         if (!validateTransactionPreExecution(transaction)) {
             alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction validation failed.");
@@ -42,9 +44,14 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    // Retrieve a transaction by ID
+    // Retrieve a transaction by ID with optional alerting
     public Optional<Transaction> getTransactionById(String transactionId) {
-        return transactionRepository.findByTransactionId(transactionId);
+        Optional<Transaction> transaction = transactionRepository.findByTransactionId(transactionId);
+        transaction.ifPresentOrElse(
+                t -> alertService.preExecutionAlert(transactionId, "Transaction found."),
+                () -> alertService.preExecutionAlert(transactionId, "Transaction not found.")
+        );
+        return transaction;
     }
 
     // Retrieve all transactions
@@ -52,7 +59,7 @@ public class TransactionService {
         return transactionRepository.findAll();
     }
 
-    // Update an existing transaction
+    // Update an existing transaction with validation and alerts
     public Transaction updateTransaction(String transactionId, Transaction updatedTransaction) {
         return transactionRepository.findByTransactionId(transactionId)
                 .map(existingTransaction -> {
@@ -69,7 +76,7 @@ public class TransactionService {
                 .orElse(null);
     }
 
-    // Delete a transaction by ID
+    // Delete a transaction by ID with alerting
     public boolean deleteTransaction(String transactionId) {
         Optional<Transaction> transaction = transactionRepository.findByTransactionId(transactionId);
         if (transaction.isPresent()) {
@@ -81,7 +88,7 @@ public class TransactionService {
         return false;
     }
 
-    // Pre-execution validation for fat finger errors and range checks
+    // Pre-execution validation for fat-finger errors and range checks
     public boolean validateTransactionPreExecution(Transaction transaction) {
         return ValidationUtil.validateTransactionRange(transaction, minPrice, maxPrice, minQuantity, maxQuantity);
     }

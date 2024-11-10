@@ -26,18 +26,19 @@ public class TransactionDTO {
     private String status;
 
     private String assetClass; // Optional asset class field for categorization
-
     private String strategy; // Optional field for strategy used in the transaction
+    private String symbol; // Add this field for symbol compatibility with verification
 
     // Constructors
     public TransactionDTO() {}
 
-    public TransactionDTO(String transactionId, Double price, Integer quantity, String uid, String status) {
+    public TransactionDTO(String transactionId, Double price, Integer quantity, String uid, String status, String symbol) {
         this.transactionId = transactionId;
         this.price = price;
         this.quantity = quantity;
         this.uid = uid;
         this.status = status;
+        this.symbol = symbol;
     }
 
     // Getters and Setters
@@ -95,5 +96,13 @@ public class TransactionDTO {
 
     public void setStrategy(String strategy) {
         this.strategy = strategy;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 }
