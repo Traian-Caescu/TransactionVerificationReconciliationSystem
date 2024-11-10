@@ -3,7 +3,6 @@ package org.example.model;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,20 +13,26 @@ public class MismatchLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Transaction ID is required")
     private String transactionId;
+
+    @NotBlank(message = "Field is required")
     private String field;
+
     private String internalValue;
     private String externalValue;
+
+    @NotBlank(message = "Source is required")
     private String source;
+
     private String description;
 
     @Column(name = "timestamp", nullable = false)
     private LocalDateTime timestamp;
 
-    // Constructors, Getters, and Setters
-
+    // Constructors
     public MismatchLog() {
-        this.timestamp = LocalDateTime.now();  // Default to current time
+        this.timestamp = LocalDateTime.now();  // Automatically set timestamp on creation
     }
 
     public MismatchLog(String transactionId, String field, String internalValue, String externalValue, String source, String description) {
@@ -40,6 +45,7 @@ public class MismatchLog {
         this.timestamp = LocalDateTime.now();
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }

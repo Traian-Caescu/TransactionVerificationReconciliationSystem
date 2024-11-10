@@ -18,5 +18,4 @@ public interface StockDataRepository extends JpaRepository<StockData, Long> {
             "(:endDate IS NULL OR s.date <= :endDate)")
     List<StockData> findByDateRange(@Param("startDate") LocalDate startDate,
                                     @Param("endDate") LocalDate endDate);
-
 }

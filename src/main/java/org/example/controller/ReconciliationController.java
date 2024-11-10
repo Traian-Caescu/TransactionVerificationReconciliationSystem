@@ -56,19 +56,19 @@ public class ReconciliationController {
 
     // View to display transaction mismatch alerts on the frontend
     @GetMapping("/viewAlerts")
-    public String viewAlerts(Model model) {
+    public ResponseEntity<List<MismatchLog>> viewAlerts() {
         List<MismatchLog> mismatches = verificationService.getAllMismatches();
-        model.addAttribute("alerts", mismatches);
-        return "alerts"; // Thymeleaf template for alerts display
+        return ResponseEntity.ok(mismatches);
     }
+
 
     // View to display the most active options on the frontend
     @GetMapping("/viewActiveOptions")
-    public String getActiveOptionsPage(Model model) {
+    public ResponseEntity<List<OptionDTO>> getActiveOptionsPage() {
         List<OptionDTO> activeOptions = externalTransactionService.fetchMostActiveOptions();
-        model.addAttribute("activeOptions", activeOptions);
-        return "active-options"; // Thymeleaf template for active options display
+        return ResponseEntity.ok(activeOptions);
     }
+
 
     // Endpoint to generate a detailed mismatch summary report
     @GetMapping("/mismatch-report")

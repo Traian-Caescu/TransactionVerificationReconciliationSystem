@@ -35,7 +35,6 @@ public class TransactionController {
                 transactionDTO.getStatus()
         );
 
-        // Pre-execution validation
         if (!transactionService.validateTransactionPreExecution(transaction)) {
             alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction failed pre-execution validation.");
             return ResponseEntity.badRequest().body("Transaction validation failed.");
@@ -56,7 +55,7 @@ public class TransactionController {
                 });
     }
 
-    // Endpoint to retrieve all transactions with enhanced DTO mapping
+    // Endpoint to retrieve all transactions
     @GetMapping
     public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
         List<Transaction> transactions = transactionService.getAllTransactions();
@@ -72,7 +71,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactionDTOs);
     }
 
-    // Endpoint to update an existing transaction by ID with validation and alert
+    // Endpoint to update an existing transaction by ID with validation
     @PutMapping("/{transactionId}")
     public ResponseEntity<?> updateTransaction(
             @PathVariable String transactionId,
@@ -95,7 +94,7 @@ public class TransactionController {
         return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
     }
 
-    // Endpoint to delete a transaction by ID with confirmation alerts
+    // Endpoint to delete a transaction by ID
     @DeleteMapping("/{transactionId}")
     public ResponseEntity<?> deleteTransaction(@PathVariable String transactionId) {
         boolean isDeleted = transactionService.deleteTransaction(transactionId);
@@ -106,12 +105,5 @@ public class TransactionController {
             alertService.preExecutionAlert(transactionId, "Transaction deletion failed. Not found.");
             return ResponseEntity.notFound().build();
         }
-    }
-
-    // Endpoint to trigger alerts for potential mismatches in a transaction
-    @GetMapping("/alerts/{transactionId}")
-    public ResponseEntity<?> triggerTransactionAlerts(@PathVariable String transactionId) {
-        List<String> alerts = alertService.generateAlertsForTransaction(transactionId);
-        return ResponseEntity.ok(alerts);
     }
 }

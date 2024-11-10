@@ -1,13 +1,11 @@
 package org.example.service;
 
 import org.example.model.Transaction;
-import org.example.model.TransactionMismatch;
 import org.example.repository.TransactionRepository;
 import org.example.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +33,7 @@ public class TransactionService {
         this.alertService = alertService;
     }
 
-    // Save a new transaction with pre-execution validation and alerting on failure
+    // Save a new transaction with validation
     public Transaction saveTransaction(Transaction transaction) {
         if (!validateTransactionPreExecution(transaction)) {
             alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction validation failed.");
@@ -54,7 +52,7 @@ public class TransactionService {
         return transactionRepository.findAll();
     }
 
-    // Update an existing transaction with validation and alerting on failure
+    // Update an existing transaction
     public Transaction updateTransaction(String transactionId, Transaction updatedTransaction) {
         return transactionRepository.findByTransactionId(transactionId)
                 .map(existingTransaction -> {
@@ -85,57 +83,6 @@ public class TransactionService {
 
     // Pre-execution validation for fat finger errors and range checks
     public boolean validateTransactionPreExecution(Transaction transaction) {
-        boolean isValid = ValidationUtil.validateTransactionRange(transaction, minPrice, maxPrice, minQuantity, maxQuantity);
-
-        if (!isValid) {
-            alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction failed range checks.");
-        }
-
-        return isValid;
-    }
-
-    // Track mismatches with an external data source
-    public List<TransactionMismatch> trackMismatches(List<Transaction> externalTransactions) {
-        List<TransactionMismatch> mismatches = new ArrayList<>();
-
-        for (Transaction externalTransaction : externalTransactions) {
-            Optional<Transaction> internalTransactionOpt = getTransactionById(externalTransaction.getTransactionId());
-
-            if (internalTransactionOpt.isPresent()) {
-                Transaction internalTransaction = internalTransactionOpt.get();
-                if (!internalTransaction.equals(externalTransaction)) {
-                    mismatches.add(createMismatch(internalTransaction, externalTransaction));
-                }
-            } else {
-                mismatches.add(createMismatch(null, externalTransaction));
-            }
-        }
-
-        return mismatches;
-    }
-
-    // Create a TransactionMismatch object for logging purposes
-    private TransactionMismatch createMismatch(Transaction internalTransaction, Transaction externalTransaction) {
-        TransactionMismatch mismatch = new TransactionMismatch();
-        mismatch.setTransactionId(externalTransaction.getTransactionId());
-
-        if (internalTransaction != null) {
-            if (internalTransaction.getPrice() != externalTransaction.getPrice()) {
-                mismatch.setField("Price");
-                mismatch.setInternalValue(String.valueOf(internalTransaction.getPrice()));
-                mismatch.setExternalValue(String.valueOf(externalTransaction.getPrice()));
-            }
-            if (internalTransaction.getQuantity() != externalTransaction.getQuantity()) {
-                mismatch.setField("Quantity");
-                mismatch.setInternalValue(String.valueOf(internalTransaction.getQuantity()));
-                mismatch.setExternalValue(String.valueOf(externalTransaction.getQuantity()));
-            }
-        } else {
-            mismatch.setField("Not Found");
-            mismatch.setInternalValue("N/A");
-            mismatch.setExternalValue(String.valueOf(externalTransaction));
-        }
-
-        return mismatch;
+        return ValidationUtil.validateTransactionRange(transaction, minPrice, maxPrice, minQuantity, maxQuantity);
     }
 }

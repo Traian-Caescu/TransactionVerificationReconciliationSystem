@@ -4,7 +4,6 @@ import org.example.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
-
 import java.util.List;
 
 @Repository
@@ -23,5 +22,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findByQuantityBetween(int minQuantity, int maxQuantity);
 
     Optional<Transaction> findByTransactionId(String transactionId);
-
 }

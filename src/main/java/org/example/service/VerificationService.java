@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.example.dto.TransactionDTO;
 import org.example.model.MismatchLog;
 import org.example.model.Transaction;
 import org.example.repository.MismatchLogRepository;
@@ -12,14 +11,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class VerificationService {
 
     private final TransactionRepository transactionRepository;
     private final MismatchLogRepository mismatchLogRepository;
-    private final ExternalTransactionService externalTransactionService;
 
     // Thresholds for validation
     @Value("${transaction.price.min:10}")
@@ -35,12 +32,9 @@ public class VerificationService {
     private int maxQuantity;
 
     @Autowired
-    public VerificationService(TransactionRepository transactionRepository,
-                               MismatchLogRepository mismatchLogRepository,
-                               ExternalTransactionService externalTransactionService) {
+    public VerificationService(TransactionRepository transactionRepository, MismatchLogRepository mismatchLogRepository) {
         this.transactionRepository = transactionRepository;
         this.mismatchLogRepository = mismatchLogRepository;
-        this.externalTransactionService = externalTransactionService;
     }
 
     // Verify transactions against internal records and log mismatches
@@ -77,6 +71,11 @@ public class VerificationService {
         return mismatchLog;  // Return the logged mismatch
     }
 
+    // Retrieve all mismatches for post-execution analysis
+    public List<MismatchLog> getAllMismatches() {
+        return mismatchLogRepository.findAll();
+    }
+
     // Pre-execution validation for fat finger errors and range checks
     public boolean validateTransactionPreExecution(Transaction transaction) {
         boolean isValid = validateTransactionRange(transaction);
@@ -95,9 +94,9 @@ public class VerificationService {
                 && transaction.getQuantity() >= minQuantity && transaction.getQuantity() <= maxQuantity;
     }
 
-    // Retrieve all mismatches for post-execution analysis
-    public List<MismatchLog> getAllMismatches() {
-        return mismatchLogRepository.findAll();
+    // Fetch mismatches specific to a transaction for reporting
+    public List<MismatchLog> getMismatchesByTransactionId(String transactionId) {
+        return mismatchLogRepository.findByTransactionId(transactionId);
     }
 
     // Generate a detailed mismatch report, providing a breakdown by source
@@ -111,10 +110,5 @@ public class VerificationService {
                         ", External Value: " + mismatch.getExternalValue() +
                         ", Source: " + mismatch.getSource()
         ));
-    }
-
-    // Fetch mismatches specific to a transaction for reporting
-    public List<MismatchLog> getMismatchesByTransactionId(String transactionId) {
-        return mismatchLogRepository.findByTransactionId(transactionId);
     }
 }
