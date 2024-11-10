@@ -2,15 +2,35 @@ package org.example.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Transaction {
+
     @Id
+    @NotBlank(message = "Transaction ID is required")
     private String transactionId;
+
+    @NotBlank(message = "UID is required")
     private String uid; // Unique identifier for the trader
+
+    @NotNull(message = "Price is required")
+    @Positive(message = "Price must be positive")
     private double price;
+
+    @NotNull(message = "Quantity is required")
+    @Positive(message = "Quantity must be positive")
     private int quantity;
+
+    @NotBlank(message = "Status is required")
+    @Size(max = 20, message = "Status cannot exceed 20 characters")
     private String status; // Status of the transaction (e.g., executed, pending)
+
+    private String assetClass; // Optional field for asset class tracking
+    private String strategy; // Optional field for trading strategy
 
     // Constructors
     public Transaction() {}
@@ -21,9 +41,6 @@ public class Transaction {
         this.price = price;
         this.quantity = quantity;
         this.status = status;
-    }
-
-    public Transaction(String transactionId, Double price, Integer quantity, String uid, String status) {
     }
 
     // Getters and Setters
@@ -65,5 +82,21 @@ public class Transaction {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAssetClass() {
+        return assetClass;
+    }
+
+    public void setAssetClass(String assetClass) {
+        this.assetClass = assetClass;
+    }
+
+    public String getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(String strategy) {
+        this.strategy = strategy;
     }
 }

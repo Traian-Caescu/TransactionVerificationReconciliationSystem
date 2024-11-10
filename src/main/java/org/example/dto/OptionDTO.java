@@ -1,15 +1,34 @@
 package org.example.dto;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
 public class OptionDTO {
-    private String symbol; // e.g., "NVDA"
-    private String symbolType; // e.g., "1" (type of the symbol)
-    private String symbolName; // e.g., "Nvidia Corp" (full name of the symbol)
-    private String hasOptions; // Change to String to accept "Yes" or "No"
-    private double lastPrice; // e.g., 148.88 (the last price of the option)
-    private double priceChange; // e.g., 3.27 (price change from previous close)
-    private String percentChange; // e.g., "+2.25%" (percentage change)
-    private String optionsTotalVolume; // e.g., "3,439,734" (total volume of options traded)
-    private String optionsCallVolumePercent; // e.g., "63.79%" (percentage of call options)
+
+    @NotBlank(message = "Symbol is mandatory")
+    private String symbol;
+
+    @NotBlank(message = "Symbol type is mandatory")
+    private String symbolType;
+
+    @NotBlank(message = "Symbol name is mandatory")
+    private String symbolName;
+
+    private String hasOptions; // Boolean represented as "Yes" or "No"
+
+    @NotNull(message = "Last price is required")
+    @Positive(message = "Last price must be a positive value")
+    private double lastPrice;
+
+    private double priceChange;
+
+    private String percentChange;
+
+    @NotBlank(message = "Options total volume is required")
+    private String optionsTotalVolume;
+
+    private String optionsCallVolumePercent;
 
     // Default constructor
     public OptionDTO() {}
@@ -21,7 +40,7 @@ public class OptionDTO {
         this.symbol = symbol;
         this.symbolType = symbolType;
         this.symbolName = symbolName;
-        this.hasOptions = hasOptions; // Keep as String
+        this.hasOptions = hasOptions;
         this.lastPrice = lastPrice;
         this.priceChange = priceChange;
         this.percentChange = percentChange;
@@ -55,11 +74,11 @@ public class OptionDTO {
     }
 
     public String getHasOptions() {
-        return hasOptions; // Return as String
+        return hasOptions;
     }
 
     public void setHasOptions(String hasOptions) {
-        this.hasOptions = hasOptions; // Set as String
+        this.hasOptions = hasOptions;
     }
 
     public double getLastPrice() {

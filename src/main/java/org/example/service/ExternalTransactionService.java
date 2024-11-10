@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.dto.OptionDTO; // Ensure OptionDTO is imported
+import org.example.dto.OptionDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -25,7 +25,7 @@ public class ExternalTransactionService {
         this.restTemplate = restTemplate;
     }
 
-    // Fetch most active stock options
+    // Fetch most active stock options from external API with error handling
     public List<OptionDTO> fetchMostActiveOptions() {
         String apiUrl = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/options/most-active?type=STOCKS";
         HttpHeaders headers = new HttpHeaders();
@@ -41,22 +41,18 @@ public class ExternalTransactionService {
                     entity,
                     ResponseWrapper.class);
 
-            // Log the response
             System.out.println("Response from API: " + response.getBody());
-
             return response.getBody() != null ? response.getBody().getBody() : Collections.emptyList();
         } catch (RestClientException e) {
             System.err.println("Error fetching most active options: " + e.getMessage());
-            return Collections.emptyList(); // Return an empty list on error
+            return Collections.emptyList(); // Return empty list on error to prevent system disruption
         }
     }
 
-
-
-    // Define a wrapper for the response to match the API response structure
+    // Wrapper to match the API response structure for deserialization
     public static class ResponseWrapper {
         private String status;
-        private List<OptionDTO> body; // List of OptionDTOs
+        private List<OptionDTO> body;
 
         public String getStatus() {
             return status;
@@ -74,5 +70,4 @@ public class ExternalTransactionService {
             this.body = body;
         }
     }
-
 }

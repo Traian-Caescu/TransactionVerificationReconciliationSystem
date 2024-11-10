@@ -23,11 +23,11 @@ public class CsvDataService {
         this.stockDataRepository = stockDataRepository;
     }
 
-    // Load CSV data into the database
+    // Load CSV data into the database with error handling and logging
     public String loadCsvData() {
         try (CSVReader reader = new CSVReader(new InputStreamReader(new ClassPathResource("BTC-USD_stock_data.csv").getInputStream()))) {
             List<StockData> stockDataList = reader.readAll().stream()
-                    .skip(1) // Skip header
+                    .skip(1) // Skip header row
                     .map(data -> new StockData(
                             LocalDate.parse(data[0]),
                             Double.parseDouble(data[1]),
@@ -41,6 +41,7 @@ public class CsvDataService {
 
             stockDataRepository.saveAll(stockDataList);
 
+            System.out.println("CSV data loaded successfully. Total rows: " + stockDataList.size());
             return "CSV data loaded successfully. Total rows: " + stockDataList.size();
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,7 +49,7 @@ public class CsvDataService {
         }
     }
 
-    // Get filtered stock data by date range and sort criteria
+    // Retrieve filtered stock data by date range and sorting criteria
     public List<StockData> getFilteredStockData(LocalDate startDate, LocalDate endDate, String sortBy, boolean asc) {
         List<StockData> data = stockDataRepository.findByDateRange(startDate, endDate);
 
@@ -62,8 +63,7 @@ public class CsvDataService {
                 .collect(Collectors.toList());
     }
 
-
-    // Helper method to get the comparator based on the sorting criteria
+    // Helper method to get comparator based on sorting criteria
     private Comparator<StockData> getComparator(String sortBy) {
         switch (sortBy.toLowerCase()) {
             case "open":
@@ -77,7 +77,7 @@ public class CsvDataService {
             case "volume":
                 return Comparator.comparing(StockData::getVolume);
             default:
-                return Comparator.comparing(StockData::getDate);
+                return Comparator.comparing(StockData::getDate); // Default sort by date
         }
     }
 }

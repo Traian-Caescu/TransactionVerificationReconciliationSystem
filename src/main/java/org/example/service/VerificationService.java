@@ -1,7 +1,6 @@
 package org.example.service;
 
-import org.example.dto.TransactionDTO; // Import TransactionDTO for external data
-import org.example.dto.OptionDTO; // Import OptionDTO for options data
+import org.example.dto.TransactionDTO;
 import org.example.model.MismatchLog;
 import org.example.model.Transaction;
 import org.example.repository.MismatchLogRepository;
@@ -20,7 +19,7 @@ public class VerificationService {
 
     private final TransactionRepository transactionRepository;
     private final MismatchLogRepository mismatchLogRepository;
-    private final ExternalTransactionService externalTransactionService; // Reference to the external service
+    private final ExternalTransactionService externalTransactionService;
 
     // Thresholds for validation
     @Value("${transaction.price.min:10}")
@@ -41,35 +40,12 @@ public class VerificationService {
                                ExternalTransactionService externalTransactionService) {
         this.transactionRepository = transactionRepository;
         this.mismatchLogRepository = mismatchLogRepository;
-        this.externalTransactionService = externalTransactionService; // Initialize the external service
+        this.externalTransactionService = externalTransactionService;
     }
 
     // Verify transactions against internal records and log mismatches
     public List<MismatchLog> verifyTransactions(List<Transaction> externalTransactions, String source) {
         List<MismatchLog> mismatches = new ArrayList<>();
-
-        // Fetch most active options as external transactions
-        List<OptionDTO> fetchedExternalTransactions = externalTransactionService.fetchMostActiveOptions();
-
-        // Map OptionDTOs to TransactionDTOs
-        List<TransactionDTO> transactionDTOs = fetchedExternalTransactions.stream()
-                .map(option -> new TransactionDTO(
-                        option.getSymbol(),  // Assuming this is the transaction ID
-                        option.getLastPrice(),  // Use last price as price
-                        1, // Placeholder for quantity, replace with actual logic if necessary
-                        "UID123", // Placeholder for UID, replace with actual logic if necessary
-                        "active" // Placeholder for status
-                ))
-                .collect(Collectors.toList());
-
-        // Combine externalTransactions and fetchedExternalTransactions if necessary
-        externalTransactions.addAll(transactionDTOs.stream().map(dto -> new Transaction(
-                dto.getTransactionId(),
-                dto.getPrice(),
-                dto.getQuantity(),
-                dto.getUid(),
-                dto.getStatus()
-        )).collect(Collectors.toList()));
 
         for (Transaction externalTransaction : externalTransactions) {
             Optional<Transaction> internalTransactionOpt = transactionRepository.findByTransactionId(externalTransaction.getTransactionId());
@@ -78,25 +54,25 @@ public class VerificationService {
                 Transaction internalTransaction = internalTransactionOpt.get();
 
                 // Compare fields and log mismatches
-                checkForMismatch(internalTransaction.getTransactionId(), "price", internalTransaction.getPrice(), externalTransaction.getPrice(), source, mismatches);
-                checkForMismatch(internalTransaction.getTransactionId(), "quantity", internalTransaction.getQuantity(), externalTransaction.getQuantity(), source, mismatches);
-                checkForMismatch(internalTransaction.getTransactionId(), "UID", internalTransaction.getUid(), externalTransaction.getUid(), source, mismatches);
+                checkForMismatch(internalTransaction.getTransactionId(), "price", internalTransaction.getPrice(), externalTransaction.getPrice(), source, mismatches, "Price mismatch detected");
+                checkForMismatch(internalTransaction.getTransactionId(), "quantity", internalTransaction.getQuantity(), externalTransaction.getQuantity(), source, mismatches, "Quantity mismatch detected");
+                checkForMismatch(internalTransaction.getTransactionId(), "UID", internalTransaction.getUid(), externalTransaction.getUid(), source, mismatches, "UID mismatch detected");
             } else {
-                // Log new external transactions that don't exist in internal records
-                mismatches.add(logMismatch(externalTransaction.getTransactionId(), "status", "missing", "new external transaction", source));
+                mismatches.add(logMismatch(externalTransaction.getTransactionId(), "status", "missing", "new external transaction", source, "No matching internal transaction found"));
             }
         }
-        return mismatches;  // Return the list of mismatches
+        mismatchLogRepository.saveAll(mismatches);  // Save all mismatches at once for efficiency
+        return mismatches;
     }
 
-    private void checkForMismatch(String transactionId, String field, Object internalValue, Object externalValue, String source, List<MismatchLog> mismatches) {
+    private void checkForMismatch(String transactionId, String field, Object internalValue, Object externalValue, String source, List<MismatchLog> mismatches, String description) {
         if (!internalValue.equals(externalValue)) {
-            mismatches.add(logMismatch(transactionId, field, String.valueOf(internalValue), String.valueOf(externalValue), source));
+            mismatches.add(logMismatch(transactionId, field, String.valueOf(internalValue), String.valueOf(externalValue), source, description));
         }
     }
 
-    private MismatchLog logMismatch(String transactionId, String field, String internalValue, String externalValue, String source) {
-        MismatchLog mismatchLog = new MismatchLog(transactionId, field, internalValue, externalValue, source);
+    private MismatchLog logMismatch(String transactionId, String field, String internalValue, String externalValue, String source, String description) {
+        MismatchLog mismatchLog = new MismatchLog(transactionId, field, internalValue, externalValue, source, description);
         mismatchLogRepository.save(mismatchLog);  // Save mismatch to the database
         return mismatchLog;  // Return the logged mismatch
     }
@@ -127,14 +103,17 @@ public class VerificationService {
     // Generate a detailed mismatch report, providing a breakdown by source
     public void generateDetailedMismatchReport() {
         List<MismatchLog> mismatches = getAllMismatches();
-        mismatches.forEach(mismatch -> System.out.println("Mismatch Report - Transaction ID: " + mismatch.getTransactionId()
-                + ", Field: " + mismatch.getField()
-                + ", Internal Value: " + mismatch.getInternalValue()
-                + ", External Value: " + mismatch.getExternalValue()
-                + ", Source: " + mismatch.getSource()));
+        System.out.println("==== Mismatch Report ====");
+        mismatches.forEach(mismatch -> System.out.println(
+                "Transaction ID: " + mismatch.getTransactionId() +
+                        ", Field: " + mismatch.getField() +
+                        ", Internal Value: " + mismatch.getInternalValue() +
+                        ", External Value: " + mismatch.getExternalValue() +
+                        ", Source: " + mismatch.getSource()
+        ));
     }
 
-    // Method to fetch mismatches specific to a transaction
+    // Fetch mismatches specific to a transaction for reporting
     public List<MismatchLog> getMismatchesByTransactionId(String transactionId) {
         return mismatchLogRepository.findByTransactionId(transactionId);
     }

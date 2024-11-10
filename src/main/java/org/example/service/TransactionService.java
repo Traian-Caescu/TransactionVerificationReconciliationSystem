@@ -17,6 +17,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AlertService alertService;
 
+    // Validation thresholds
     @Value("${transaction.price.min:10}")
     private double minPrice;
 
@@ -34,32 +35,33 @@ public class TransactionService {
         this.alertService = alertService;
     }
 
+    // Save a new transaction with pre-execution validation and alerting on failure
     public Transaction saveTransaction(Transaction transaction) {
-        if (transaction.getTransactionId() == null || transaction.getTransactionId().isEmpty()) {
-            alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction ID cannot be null or empty.");
+        if (!validateTransactionPreExecution(transaction)) {
+            alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction validation failed.");
             return null;
         }
-
-        boolean isValid = validateTransactionPreExecution(transaction);
-        if (isValid) {
-            return transactionRepository.save(transaction);
-        } else {
-            alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction failed validation checks.");
-            return null;
-        }
+        return transactionRepository.save(transaction);
     }
- 
+
+    // Retrieve a transaction by ID
     public Optional<Transaction> getTransactionById(String transactionId) {
         return transactionRepository.findByTransactionId(transactionId);
     }
 
+    // Retrieve all transactions
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
 
+    // Update an existing transaction with validation and alerting on failure
     public Transaction updateTransaction(String transactionId, Transaction updatedTransaction) {
         return transactionRepository.findByTransactionId(transactionId)
                 .map(existingTransaction -> {
+                    if (!validateTransactionPreExecution(updatedTransaction)) {
+                        alertService.preExecutionAlert(transactionId, "Update validation failed.");
+                        return null;
+                    }
                     existingTransaction.setPrice(updatedTransaction.getPrice());
                     existingTransaction.setQuantity(updatedTransaction.getQuantity());
                     existingTransaction.setStatus(updatedTransaction.getStatus());
@@ -69,23 +71,30 @@ public class TransactionService {
                 .orElse(null);
     }
 
+    // Delete a transaction by ID
     public boolean deleteTransaction(String transactionId) {
         Optional<Transaction> transaction = transactionRepository.findByTransactionId(transactionId);
         if (transaction.isPresent()) {
             transactionRepository.delete(transaction.get());
+            alertService.preExecutionAlert(transactionId, "Transaction successfully deleted.");
             return true;
         }
+        alertService.preExecutionAlert(transactionId, "Transaction deletion failed. Not found.");
         return false;
     }
 
-    private boolean validateTransactionPreExecution(Transaction transaction) {
+    // Pre-execution validation for fat finger errors and range checks
+    public boolean validateTransactionPreExecution(Transaction transaction) {
         boolean isValid = ValidationUtil.validateTransactionRange(transaction, minPrice, maxPrice, minQuantity, maxQuantity);
+
         if (!isValid) {
-            System.out.println("Alert: Potential input error for transaction ID " + transaction.getTransactionId());
+            alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction failed range checks.");
         }
+
         return isValid;
     }
 
+    // Track mismatches with an external data source
     public List<TransactionMismatch> trackMismatches(List<Transaction> externalTransactions) {
         List<TransactionMismatch> mismatches = new ArrayList<>();
 
@@ -105,6 +114,7 @@ public class TransactionService {
         return mismatches;
     }
 
+    // Create a TransactionMismatch object for logging purposes
     private TransactionMismatch createMismatch(Transaction internalTransaction, Transaction externalTransaction) {
         TransactionMismatch mismatch = new TransactionMismatch();
         mismatch.setTransactionId(externalTransaction.getTransactionId());

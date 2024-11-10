@@ -1,6 +1,10 @@
 package org.example.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "mismatch_logs")
@@ -11,21 +15,29 @@ public class MismatchLog {
     private Long id;
 
     private String transactionId;
-    private String field;  // The field where the mismatch occurred (e.g., "price", "quantity")
-    private String internalValue;  // The value in our system
-    private String externalValue;  // The value from the external source
-    private String source; // New field to identify the source of the external data
+    private String field;
+    private String internalValue;
+    private String externalValue;
+    private String source;
+    private String description;
+
+    @Column(name = "timestamp", nullable = false)
+    private LocalDateTime timestamp;
 
     // Constructors, Getters, and Setters
 
-    public MismatchLog() {}
+    public MismatchLog() {
+        this.timestamp = LocalDateTime.now();  // Default to current time
+    }
 
-    public MismatchLog(String transactionId, String field, String internalValue, String externalValue, String source) {
+    public MismatchLog(String transactionId, String field, String internalValue, String externalValue, String source, String description) {
         this.transactionId = transactionId;
         this.field = field;
         this.internalValue = internalValue;
         this.externalValue = externalValue;
         this.source = source;
+        this.description = description;
+        this.timestamp = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -70,5 +82,21 @@ public class MismatchLog {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
     }
 }

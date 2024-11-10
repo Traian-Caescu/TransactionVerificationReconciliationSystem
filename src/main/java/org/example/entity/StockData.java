@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
@@ -11,24 +12,31 @@ public class StockData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Date is required")
     @Column(nullable = false)
     private LocalDate date;
 
+    @NotNull(message = "Open price is required")
     @Column(nullable = false)
     private Double open;
 
+    @NotNull(message = "High price is required")
     @Column(nullable = false)
     private Double high;
 
+    @NotNull(message = "Low price is required")
     @Column(nullable = false)
     private Double low;
 
+    @NotNull(message = "Close price is required")
     @Column(nullable = false)
     private Double close;
 
+    @NotNull(message = "Adjusted close price is required")
     @Column(nullable = false)
     private Double adjClose;
 
+    @NotNull(message = "Volume is required")
     @Column(nullable = false)
     private Long volume;
 
@@ -46,7 +54,7 @@ public class StockData {
         this.volume = volume;
     }
 
-    // Getters
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -55,57 +63,52 @@ public class StockData {
         return date;
     }
 
-    public Double getOpen() {
-        return open;
-    }
-
-    public Double getHigh() {
-        return high;
-    }
-
-    public Double getLow() {
-        return low;
-    }
-
-    public Double getClose() {
-        return close;
-    }
-
-    public Double getAdjClose() {
-        return adjClose;
-    }
-
-    public Long getVolume() {
-        return volume;
-    }
-
-    // Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public Double getOpen() {
+        return open;
     }
 
     public void setOpen(Double open) {
         this.open = open;
     }
 
+    public Double getHigh() {
+        return high;
+    }
+
     public void setHigh(Double high) {
         this.high = high;
+    }
+
+    public Double getLow() {
+        return low;
     }
 
     public void setLow(Double low) {
         this.low = low;
     }
 
+    public Double getClose() {
+        return close;
+    }
+
     public void setClose(Double close) {
         this.close = close;
     }
 
+    public Double getAdjClose() {
+        return adjClose;
+    }
+
     public void setAdjClose(Double adjClose) {
         this.adjClose = adjClose;
+    }
+
+    public Long getVolume() {
+        return volume;
     }
 
     public void setVolume(Long volume) {

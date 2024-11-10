@@ -1,6 +1,8 @@
 package org.example.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,28 +13,35 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Action description is required")
     private String action;  // Description of the action (e.g., "Transaction Verified", "Mismatch Detected")
 
-    @Column(nullable = false)
+    @NotBlank(message = "Details are required")
+    @Column(length = 500) // Set a max length for the details field
     private String details;  // Detailed information about the action
 
-    @Column(nullable = false)
+    @NotNull(message = "Timestamp is required")
     private LocalDateTime timestamp;
+
+    private String performedBy; // Name or ID of the user who performed the action
+
+    private String ipAddress; // IP address from where the action was performed, for security tracking
 
     // Default constructor
     public AuditLog() {
-        this.timestamp = LocalDateTime.now(); // Set timestamp to now by default
+        this.timestamp = LocalDateTime.now(); // Automatically set timestamp on creation
     }
 
     // Parameterized constructor
-    public AuditLog(String action, String details) {
+    public AuditLog(String action, String details, String performedBy, String ipAddress) {
         this.action = action;
         this.details = details;
+        this.performedBy = performedBy;
+        this.ipAddress = ipAddress;
         this.timestamp = LocalDateTime.now();
     }
 
-    // Getters
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -41,24 +50,39 @@ public class AuditLog {
         return action;
     }
 
-    public String getDetails() {
-        return details;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    // Setters
     public void setAction(String action) {
         this.action = action;
+    }
+
+    public String getDetails() {
+        return details;
     }
 
     public void setDetails(String details) {
         this.details = details;
     }
 
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getPerformedBy() {
+        return performedBy;
+    }
+
+    public void setPerformedBy(String performedBy) {
+        this.performedBy = performedBy;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 }

@@ -5,6 +5,7 @@ import org.example.repository.MismatchLogRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AlertService {
@@ -17,13 +18,11 @@ public class AlertService {
 
     // Generate alerts based on mismatches recorded in the system
     public void generateAlerts(List<MismatchLog> mismatches) {
-        for (MismatchLog mismatch : mismatches) {
+        mismatches.forEach(mismatch -> {
             String alertMessage = String.format("Mismatch detected in %s for Transaction ID %s. Internal Value: %s, External Value: %s, Source: %s",
                     mismatch.getField(), mismatch.getTransactionId(), mismatch.getInternalValue(), mismatch.getExternalValue(), mismatch.getSource());
-
-            // In a real application, this would trigger an email or notification instead of just printing
-            System.out.println("ALERT: " + alertMessage);
-        }
+            sendAlert(alertMessage);
+        });
     }
 
     // Fetch all mismatches from the repository and generate alerts
@@ -34,10 +33,11 @@ public class AlertService {
 
     // Pre-execution alert for potential errors based on out-of-bound transaction values
     public void preExecutionAlert(String transactionId, String alertMessage) {
-        System.out.println("Pre-execution Alert for Transaction ID " + transactionId + ": " + alertMessage);
+        String formattedMessage = String.format("Pre-execution Alert for Transaction ID %s: %s", transactionId, alertMessage);
+        sendAlert(formattedMessage);
     }
 
-    // Summary report for trade operations with details of all recorded mismatches
+    // Generate mismatch summary report to provide an overview of all discrepancies
     public void generateMismatchSummaryReport() {
         List<MismatchLog> mismatches = mismatchLogRepository.findAll();
         System.out.println("==== Mismatch Summary Report ====");
@@ -48,5 +48,22 @@ public class AlertService {
                         ", External Value: " + mismatch.getExternalValue() +
                         ", Source: " + mismatch.getSource()
         ));
+    }
+
+    // Generate specific alerts for a given transaction ID
+    public List<String> generateAlertsForTransaction(String transactionId) {
+        List<MismatchLog> mismatches = mismatchLogRepository.findByTransactionId(transactionId);
+        return mismatches.stream().map(mismatch -> {
+            String alertMessage = String.format("Mismatch in %s for Transaction ID %s. Internal Value: %s, External Value: %s, Source: %s",
+                    mismatch.getField(), mismatch.getTransactionId(), mismatch.getInternalValue(), mismatch.getExternalValue(), mismatch.getSource());
+            sendAlert(alertMessage);
+            return alertMessage;
+        }).collect(Collectors.toList());
+    }
+
+    // Helper method to simulate sending an alert, could be replaced with actual email or notification logic
+    private void sendAlert(String alertMessage) {
+        System.out.println("ALERT: " + alertMessage);
+        // Placeholder for real alert/notification logic, such as sending an email or notification
     }
 }

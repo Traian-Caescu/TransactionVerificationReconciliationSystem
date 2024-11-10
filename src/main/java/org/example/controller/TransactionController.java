@@ -3,9 +3,9 @@ package org.example.controller;
 import org.example.dto.TransactionDTO;
 import org.example.model.Transaction;
 import org.example.service.TransactionService;
+import org.example.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,53 +16,47 @@ import java.util.stream.Collectors;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final AlertService alertService;
 
     @Autowired
-    public TransactionController(TransactionService transactionService) {
+    public TransactionController(TransactionService transactionService, AlertService alertService) {
         this.transactionService = transactionService;
+        this.alertService = alertService;
     }
 
-    // Endpoint to create a new transaction
+    // Endpoint to create a new transaction with pre-execution validation and alerts
     @PostMapping
-    public ResponseEntity<Transaction> createTransaction(@RequestBody TransactionDTO transactionDTO) {
-        // Log the entire DTO
-        System.out.println("Received transactionDTO: " + transactionDTO);
-
-        // Validate individual fields
-        if (transactionDTO.getTransactionId() == null || transactionDTO.getTransactionId().isEmpty()) {
-            System.out.println("Error: Transaction ID is null or empty.");
-            return ResponseEntity.badRequest().body(null); // Return a bad request response
-        }
-
+    public ResponseEntity<?> createTransaction(@RequestBody TransactionDTO transactionDTO) {
         Transaction transaction = new Transaction(
                 transactionDTO.getTransactionId(),
+                transactionDTO.getUid(),
                 transactionDTO.getPrice(),
                 transactionDTO.getQuantity(),
-                transactionDTO.getUid(),
                 transactionDTO.getStatus()
         );
 
-        // Log transaction details before saving
-        System.out.println("Creating transaction with ID: " + transaction.getTransactionId());
-
-        // Attempt to save the transaction
-        Transaction savedTransaction = transactionService.saveTransaction(transaction);
-        if (savedTransaction == null) {
-            System.out.println("Error: Transaction could not be saved.");
-            return ResponseEntity.badRequest().body(null); // If null is returned, handle as needed
+        // Pre-execution validation
+        if (!transactionService.validateTransactionPreExecution(transaction)) {
+            alertService.preExecutionAlert(transaction.getTransactionId(), "Transaction failed pre-execution validation.");
+            return ResponseEntity.badRequest().body("Transaction validation failed.");
         }
+
+        Transaction savedTransaction = transactionService.saveTransaction(transaction);
         return ResponseEntity.ok(savedTransaction);
     }
 
-    // Endpoint to retrieve a transaction by ID
+    // Endpoint to retrieve a transaction by ID with error handling
     @GetMapping("/{transactionId}")
     public ResponseEntity<Transaction> getTransactionById(@PathVariable String transactionId) {
         return transactionService.getTransactionById(transactionId)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    alertService.preExecutionAlert(transactionId, "Transaction not found.");
+                    return ResponseEntity.notFound().build();
+                });
     }
 
-    // Endpoint to retrieve all transactions
+    // Endpoint to retrieve all transactions with enhanced DTO mapping
     @GetMapping
     public ResponseEntity<List<TransactionDTO>> getAllTransactions() {
         List<Transaction> transactions = transactionService.getAllTransactions();
@@ -78,27 +72,46 @@ public class TransactionController {
         return ResponseEntity.ok(transactionDTOs);
     }
 
-    // Endpoint to update an existing transaction by ID
+    // Endpoint to update an existing transaction by ID with validation and alert
     @PutMapping("/{transactionId}")
-    public ResponseEntity<Transaction> updateTransaction(
+    public ResponseEntity<?> updateTransaction(
             @PathVariable String transactionId,
-            @Validated @RequestBody TransactionDTO transactionDTO) {
+            @RequestBody TransactionDTO transactionDTO) {
+
         Transaction updatedTransaction = new Transaction(
-                transactionDTO.getTransactionId(),
+                transactionId,
+                transactionDTO.getUid(),
                 transactionDTO.getPrice(),
                 transactionDTO.getQuantity(),
-                transactionDTO.getUid(),
                 transactionDTO.getStatus()
         );
+
+        if (!transactionService.validateTransactionPreExecution(updatedTransaction)) {
+            alertService.preExecutionAlert(transactionId, "Update failed validation checks.");
+            return ResponseEntity.badRequest().body("Transaction update validation failed.");
+        }
 
         Transaction result = transactionService.updateTransaction(transactionId, updatedTransaction);
         return result != null ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
     }
 
-    // Endpoint to delete a transaction by ID
+    // Endpoint to delete a transaction by ID with confirmation alerts
     @DeleteMapping("/{transactionId}")
-    public ResponseEntity<Void> deleteTransaction(@PathVariable String transactionId) {
+    public ResponseEntity<?> deleteTransaction(@PathVariable String transactionId) {
         boolean isDeleted = transactionService.deleteTransaction(transactionId);
-        return isDeleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        if (isDeleted) {
+            alertService.preExecutionAlert(transactionId, "Transaction successfully deleted.");
+            return ResponseEntity.noContent().build();
+        } else {
+            alertService.preExecutionAlert(transactionId, "Transaction deletion failed. Not found.");
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Endpoint to trigger alerts for potential mismatches in a transaction
+    @GetMapping("/alerts/{transactionId}")
+    public ResponseEntity<?> triggerTransactionAlerts(@PathVariable String transactionId) {
+        List<String> alerts = alertService.generateAlertsForTransaction(transactionId);
+        return ResponseEntity.ok(alerts);
     }
 }
