@@ -43,8 +43,8 @@ public class ReconciliationController {
                 .map(dto -> new Transaction(
                         dto.getTransactionId(),
                         dto.getUid(),
-                        dto.getPrice().doubleValue(),  // Cast to primitive double
-                        dto.getQuantity().intValue(),  // Cast to primitive int
+                        dto.getPrice().doubleValue(),
+                        dto.getQuantity().intValue(),
                         dto.getStatus(),
                         dto.getSymbol()))
                 .collect(Collectors.toList());
@@ -62,64 +62,13 @@ public class ReconciliationController {
         return ResponseEntity.ok(response);
     }
 
-    // User endpoint for simpler verification without stock data
-    @PostMapping("/user/verify")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<VerificationResponse> verifyTransactionsUser(@RequestBody List<TransactionDTO> externalTransactions) {
-        List<Transaction> transactions = externalTransactions.stream()
-                .map(dto -> new Transaction(
-                        dto.getTransactionId(),
-                        dto.getUid(),
-                        dto.getPrice().doubleValue(),  // Cast to primitive double
-                        dto.getQuantity().intValue(),  // Cast to primitive int
-                        dto.getStatus()))
-                .collect(Collectors.toList());
-
-        List<MismatchLog> mismatches = verificationService.verifyTransactions(transactions, "user_source");
-
-        VerificationResponse response = new VerificationResponse();
-        response.setMessage(mismatches.isEmpty() ? "User verification complete. No mismatches detected." : "User verification complete. Mismatches detected.");
-        response.setMismatches(mismatches);
-
-        LOGGER.log(Level.INFO, "User transaction verification complete with {0} mismatches.", mismatches.size());
-
-        return ResponseEntity.ok(response);
-    }
-
-
-    // Admin-only endpoint for generating a detailed mismatch report
-    @GetMapping("/admin/mismatch-report")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<String> generateMismatchReport() {
-        verificationService.generateDetailedMismatchReport();
-        LOGGER.log(Level.INFO, "Mismatch report generated.");
-        return ResponseEntity.ok("Mismatch report generated in logs.");
-    }
-
-    // Open endpoint to fetch most active options from Yahoo Finance
+    // Endpoint to fetch the most active options from Yahoo Finance
     @GetMapping("/active-options")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OptionDTO>> getMostActiveOptions() {
         List<OptionDTO> activeOptions = externalTransactionService.fetchMostActiveOptions();
         LOGGER.log(Level.INFO, "Most active options fetched from Yahoo Finance.");
         return ResponseEntity.ok(activeOptions);
-    }
-
-    // User-specific endpoint to retrieve alerts for a specific transaction
-    @GetMapping("/user/alerts/{transactionId}")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<String>> getAlertsForTransaction(@PathVariable String transactionId) {
-        List<String> alerts = alertService.generateAlertsForTransaction(transactionId);
-        LOGGER.log(Level.INFO, "Alerts retrieved for transaction ID: {0}", transactionId);
-        return alerts.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(alerts);
-    }
-
-    // Admin-only endpoint to retrieve all mismatch alerts
-    @GetMapping("/admin/alerts")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<MismatchLog>> getAllAlerts() {
-        List<MismatchLog> mismatches = verificationService.getAllMismatches();
-        LOGGER.log(Level.INFO, "All mismatch alerts retrieved.");
-        return ResponseEntity.ok(mismatches);
     }
 
     // Inner class to represent the verification response structure
