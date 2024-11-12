@@ -2,6 +2,7 @@ package org.example.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -10,7 +11,6 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.http.HttpStatus;
 
 @Configuration
 @EnableWebSecurity
@@ -20,14 +20,14 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         return new InMemoryUserDetailsManager(
                 User.withDefaultPasswordEncoder()
-                        .username("admin")
-                        .password("adminpassword")
-                        .roles("ADMIN")
+                        .username("senior")
+                        .password("seniorpassword")
+                        .roles("SENIOR")
                         .build(),
                 User.withDefaultPasswordEncoder()
-                        .username("user")
-                        .password("userpassword")
-                        .roles("USER")
+                        .username("junior")
+                        .password("juniorpassword")
+                        .roles("JUNIOR")
                         .build()
         );
     }
@@ -38,25 +38,40 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/authenticate").permitAll()
-                .antMatchers("/data/load", "/api/reconciliation/**").hasRole("ADMIN")
-                .antMatchers("/data/view", "/api/transactions/**").hasAnyRole("USER", "ADMIN")
+                // Senior role can access transaction management and reconciliation
+                .antMatchers("/data/load", "/api/reconciliation/**").hasRole("SENIOR")
+                // Junior role has limited access to view and submit transactions
+                .antMatchers("/data/view", "/api/transactions/create").hasAnyRole("JUNIOR", "SENIOR") // Allow both roles to view
+                .antMatchers("/api/transactions/**").hasAnyRole("JUNIOR", "SENIOR")
                 .anyRequest().authenticated()
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .accessDeniedHandler(accessDeniedHandler())
                 .and()
                 .httpBasic()
                 .and()
                 .sessionManagement()
-                .maximumSessions(1)  // Limits concurrent sessions to one per user
-                .maxSessionsPreventsLogin(true)  // Prevents new logins if max sessions reached
-                .expiredUrl("/login?expired=true")  // Redirect to login page if session expired
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true)
+                .expiredUrl("/login?expired=true")
                 .and()
-                .sessionFixation().migrateSession()  // Prevents session fixation attacks
+                .sessionFixation().migrateSession()
                 .and()
                 .logout()
-                .logoutUrl("/logout")  // Defines custom logout URL
-                .logoutSuccessUrl("/login?logout=true")  // Redirects to login after logout
-                .deleteCookies("JSESSIONID")  // Removes session cookie on logout
-                .invalidateHttpSession(true);  // Invalidates session on logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .deleteCookies("JSESSIONID")
+                .invalidateHttpSession(true);
         return http.build();
     }
 
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, accessDeniedException) -> {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.getWriter().write("Access Denied: You do not have permission to access this resource.");
+        };
+    }
 }

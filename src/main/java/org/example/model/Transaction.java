@@ -1,13 +1,12 @@
 package org.example.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 
 @Entity
+@Table(name = "transactions")
 public class Transaction {
 
     @Id
@@ -15,7 +14,7 @@ public class Transaction {
     private String transactionId;
 
     @NotBlank(message = "UID is required")
-    private String uid; // Unique identifier for the trader
+    private String uid;
 
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be positive")
@@ -25,28 +24,16 @@ public class Transaction {
     @Positive(message = "Quantity must be positive")
     private int quantity;
 
-    @NotBlank(message = "Status is required")
-    @Size(max = 20, message = "Status cannot exceed 20 characters")
-    private String status; // Status of the transaction (e.g., executed, pending)
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
 
-    private String assetClass; // Optional field for asset class tracking
-    private String strategy; // Optional field for trading strategy
-    private String symbol; // Optional field for compatibility with Yahoo Finance data
+    private String assetClass;
+    private String strategy;
+    private String symbol;
 
-    // Default constructor
     public Transaction() {}
 
-    // Constructor without symbol field
-    public Transaction(String transactionId, String uid, double price, int quantity, String status) {
-        this.transactionId = transactionId;
-        this.uid = uid;
-        this.price = price;
-        this.quantity = quantity;
-        this.status = status;
-    }
-
-    // Constructor with symbol field
-    public Transaction(String transactionId, String uid, double price, int quantity, String status, String symbol) {
+    public Transaction(String transactionId, String uid, double price, int quantity, TransactionStatus status, String symbol) {
         this.transactionId = transactionId;
         this.uid = uid;
         this.price = price;
@@ -88,11 +75,11 @@ public class Transaction {
         this.quantity = quantity;
     }
 
-    public String getStatus() {
+    public TransactionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TransactionStatus status) {
         this.status = status;
     }
 

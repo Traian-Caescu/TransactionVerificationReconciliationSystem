@@ -9,6 +9,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -34,7 +36,14 @@ public class ExternalTransactionService {
         this.objectMapper = new ObjectMapper();
     }
 
+    // Fetch most active options based on the current user's role
     public List<OptionDTO> fetchMostActiveOptions() {
+        String userRole = getUserRole();
+        if (!"SENIOR".equals(userRole)) {
+            LOGGER.log(Level.WARNING, "Access denied. {0} role is not permitted to fetch most active options.", userRole);
+            return new ArrayList<>();
+        }
+
         String url = "https://yahoo-finance15.p.rapidapi.com/api/v1/markets/options/most-active?type=STOCKS";
         List<OptionDTO> options = new ArrayList<>();
 
@@ -48,7 +57,6 @@ public class ExternalTransactionService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             JsonNode root = objectMapper.readTree(response.getBody());
 
-            // Adjusted path to 'body' based on API response structure
             for (JsonNode optionNode : root.path("body")) {
                 OptionDTO option = new OptionDTO();
                 option.setSymbol(optionNode.path("symbol").asText());
@@ -57,8 +65,11 @@ public class ExternalTransactionService {
                 option.setOptionsTotalVolume(optionNode.path("optionsTotalVolume").asText());
                 options.add(option);
             }
+
+            LOGGER.log(Level.INFO, "Most active options fetched successfully.");
         } catch (HttpClientErrorException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching most active options from Yahoo Finance API. Status: " + e.getStatusCode() + ", Response: " + e.getResponseBodyAsString());
+            LOGGER.log(Level.SEVERE, "Error fetching most active options. Status: {0}, Response: {1}",
+                    new Object[]{e.getStatusCode(), e.getResponseBodyAsString()});
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error processing response from Yahoo Finance API", e);
         }
@@ -66,8 +77,14 @@ public class ExternalTransactionService {
         return options;
     }
 
-
+    // Fetch stock data for a list of symbols based on the user's role
     public List<OptionDTO> fetchStockData(List<String> symbols) {
+        String userRole = getUserRole();
+        if (!"SENIOR".equals(userRole)) {
+            LOGGER.log(Level.WARNING, "Access denied. {0} role is not permitted to fetch stock data.", userRole);
+            return new ArrayList<>();
+        }
+
         List<OptionDTO> stockData = new ArrayList<>();
         String symbolQuery = String.join(",", symbols);
         String url = "https://yahoo-finance15.p.rapidapi.com/api/v2/markets/tickers?symbols=" + symbolQuery;
@@ -90,8 +107,11 @@ public class ExternalTransactionService {
                 stock.setOptionsTotalVolume(stockNode.path("regularMarketVolume").asText());
                 stockData.add(stock);
             }
+
+            LOGGER.log(Level.INFO, "Stock data fetched for symbols: {0}", symbols);
         } catch (HttpClientErrorException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching stock data from Yahoo Finance API. Status: " + e.getStatusCode() + ", Response: " + e.getResponseBodyAsString());
+            LOGGER.log(Level.SEVERE, "Error fetching stock data. Status: {0}, Response: {1}",
+                    new Object[]{e.getStatusCode(), e.getResponseBodyAsString()});
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error processing response from Yahoo Finance API", e);
         }
@@ -99,6 +119,7 @@ public class ExternalTransactionService {
         return stockData;
     }
 
+    // Compare transactions with stock data to identify mismatches
     public List<String> compareWithStockData(List<Transaction> transactions) {
         List<String> mismatches = new ArrayList<>();
         List<String> symbols = new ArrayList<>();
@@ -120,6 +141,20 @@ public class ExternalTransactionService {
             }
         }
 
+        LOGGER.log(Level.INFO, "Stock data comparison completed. Mismatches found: {0}", mismatches.size());
         return mismatches;
+    }
+
+    // Helper method to retrieve the role of the currently authenticated user
+    private String getUserRole() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            return ((UserDetails) principal).getAuthorities().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("User has no roles"))
+                    .getAuthority()
+                    .replace("ROLE_", ""); // Remove "ROLE_" prefix
+        }
+        return "UNKNOWN";
     }
 }

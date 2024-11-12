@@ -1,5 +1,7 @@
 package org.example.dto;
 
+import org.example.model.TransactionStatus;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -22,7 +24,7 @@ public class TransactionDTO {
     private String uid;
 
     @NotBlank(message = "Status is mandatory")
-    @Size(max = 20, message = "Status cannot exceed 20 characters")
+    @Size(message = "Status cannot exceed 20 characters")
     private String status;
 
     private String assetClass; // Optional asset class field for categorization
@@ -32,12 +34,12 @@ public class TransactionDTO {
     // Constructors
     public TransactionDTO() {}
 
-    public TransactionDTO(String transactionId, Double price, Integer quantity, String uid, String status, String symbol) {
+    public TransactionDTO(String transactionId, Double price, Integer quantity, String uid, TransactionStatus status, String symbol) {
         this.transactionId = transactionId;
         this.price = price;
         this.quantity = quantity;
         this.uid = uid;
-        this.status = status;
+        this.status = status != null ? status.name() : null; // Store enum as String
         this.symbol = symbol;
     }
 
@@ -74,12 +76,23 @@ public class TransactionDTO {
         this.uid = uid;
     }
 
+
+
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    // Method to convert to TransactionStatus enum
+    public TransactionStatus getTransactionStatusEnum() {
+        try {
+            return TransactionStatus.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid transaction status: " + status);
+        }
     }
 
     public String getAssetClass() {

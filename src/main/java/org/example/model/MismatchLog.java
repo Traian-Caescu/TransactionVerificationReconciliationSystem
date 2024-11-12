@@ -27,12 +27,11 @@ public class MismatchLog {
 
     private String description;
 
-    @Column(name = "timestamp", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    // Constructors
     public MismatchLog() {
-        this.timestamp = LocalDateTime.now();  // Automatically set timestamp on creation
+        this.timestamp = LocalDateTime.now();
     }
 
     public MismatchLog(String transactionId, String field, String internalValue, String externalValue, String source, String description) {

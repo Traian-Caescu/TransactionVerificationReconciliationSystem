@@ -2,22 +2,39 @@ package org.example.repository;
 
 import org.example.model.MismatchLog;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface MismatchLogRepository extends JpaRepository<MismatchLog, Long> {
 
-    // Custom method to find mismatches by transaction ID, useful for transaction-specific alerts and reporting
     List<MismatchLog> findByTransactionId(String transactionId);
 
-    // Custom method to find mismatches by source, aiding in identifying issues specific to external sources
     List<MismatchLog> findBySource(String source);
 
-    // Custom method to retrieve mismatches by specific field (e.g., price, quantity) to focus on targeted discrepancies
     List<MismatchLog> findByField(String field);
 
-    // Custom method to retrieve all mismatches by transaction ID and field, useful for detailed comparison reports
     List<MismatchLog> findByTransactionIdAndField(String transactionId, String field);
+
+    List<MismatchLog> findByTimestampBetween(LocalDateTime start, LocalDateTime end);
+
+    List<MismatchLog> findByDescriptionContaining(String description);
+
+    @Query("SELECT m FROM MismatchLog m WHERE m.source = :source AND m.timestamp BETWEEN :start AND :end")
+    List<MismatchLog> findBySourceAndTimestampBetween(@Param("source") String source,
+                                                      @Param("start") LocalDateTime start,
+                                                      @Param("end") LocalDateTime end);
+
+    @Query("SELECT m FROM MismatchLog m WHERE m.field = :field AND m.source = :source")
+    List<MismatchLog> findByFieldAndSource(@Param("field") String field, @Param("source") String source);
+
+    @Query("SELECT m FROM MismatchLog m WHERE m.field = :field AND m.source = :source AND m.timestamp BETWEEN :start AND :end")
+    List<MismatchLog> findByFieldSourceAndTimestampBetween(@Param("field") String field,
+                                                           @Param("source") String source,
+                                                           @Param("start") LocalDateTime start,
+                                                           @Param("end") LocalDateTime end);
 }

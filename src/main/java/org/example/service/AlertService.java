@@ -18,17 +18,13 @@ public class AlertService {
         this.mismatchLogRepository = mismatchLogRepository;
     }
 
-    // Generate alerts for a specific transaction ID, including Yahoo Finance comparison alerts
     public List<String> generateAlertsForTransaction(String transactionId) {
         List<MismatchLog> mismatches = mismatchLogRepository.findByTransactionId(transactionId);
         return mismatches.stream()
-                .map(mismatch -> "Alert: " + mismatch.getDescription() + " | Field: " + mismatch.getField() +
-                        " | Expected: " + mismatch.getInternalValue() + " | Found: " + mismatch.getExternalValue() +
-                        " | Source: " + mismatch.getSource())
+                .map(this::formatAlertMessage)
                 .collect(Collectors.toList());
     }
 
-    // Fetch all mismatches and compile alerts for admin reporting
     public List<String> generateAdminAlerts() {
         List<MismatchLog> allMismatches = mismatchLogRepository.findAll();
         return allMismatches.stream()
@@ -40,7 +36,6 @@ public class AlertService {
                 .collect(Collectors.toList());
     }
 
-    // Generate summary of all mismatches, categorized by source for the report
     public String generateMismatchSummary() {
         List<MismatchLog> allMismatches = mismatchLogRepository.findAll();
         StringBuilder summary = new StringBuilder("=== Mismatch Summary ===\n");
@@ -57,8 +52,27 @@ public class AlertService {
         return summary.toString();
     }
 
-    // Generate pre-execution alert for transaction validation failures
     public void preExecutionAlert(String transactionId, String message) {
         System.out.println("Pre-Execution Alert: Transaction ID " + transactionId + " - " + message);
+    }
+
+    public void logRejectedTransaction(String transactionId, String field, String internalValue, String source) {
+        MismatchLog mismatchLog = new MismatchLog(
+                transactionId,
+                field,
+                internalValue,
+                "Rejected",
+                source,
+                "Transaction rejected due to role-specific validation"
+        );
+        mismatchLogRepository.save(mismatchLog);
+        System.out.println("Alert: Rejected transaction logged for Transaction ID " + transactionId);
+    }
+
+    private String formatAlertMessage(MismatchLog mismatch) {
+        return "Alert: " + mismatch.getDescription() + " | Field: " + mismatch.getField() +
+                " | Expected: " + mismatch.getInternalValue() +
+                " | Found: " + mismatch.getExternalValue() +
+                " | Source: " + mismatch.getSource();
     }
 }

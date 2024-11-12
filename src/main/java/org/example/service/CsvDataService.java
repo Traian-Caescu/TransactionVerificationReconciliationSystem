@@ -11,11 +11,14 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
 public class CsvDataService {
 
+    private static final Logger LOGGER = Logger.getLogger(CsvDataService.class.getName());
     private final StockDataRepository stockDataRepository;
 
     @Autowired
@@ -28,23 +31,15 @@ public class CsvDataService {
         try (CSVReader reader = new CSVReader(new InputStreamReader(new ClassPathResource("BTC-USD_stock_data.csv").getInputStream()))) {
             List<StockData> stockDataList = reader.readAll().stream()
                     .skip(1) // Skip header row
-                    .map(data -> new StockData(
-                            LocalDate.parse(data[0]),
-                            Double.parseDouble(data[1]),
-                            Double.parseDouble(data[2]),
-                            Double.parseDouble(data[3]),
-                            Double.parseDouble(data[4]),
-                            Double.parseDouble(data[5]),
-                            Long.parseLong(data[6])
-                    ))
+                    .map(data -> parseCsvRow(data))
                     .collect(Collectors.toList());
 
             stockDataRepository.saveAll(stockDataList);
 
-            System.out.println("CSV data loaded successfully. Total rows: " + stockDataList.size());
+            LOGGER.log(Level.INFO, "CSV data loaded successfully. Total rows: {0}", stockDataList.size());
             return "CSV data loaded successfully. Total rows: " + stockDataList.size();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to load CSV data", e);
             return "Failed to load CSV data: " + e.getMessage();
         }
     }
@@ -58,9 +53,25 @@ public class CsvDataService {
             comparator = comparator.reversed();
         }
 
-        return data.stream()
+        List<StockData> sortedData = data.stream()
                 .sorted(comparator)
                 .collect(Collectors.toList());
+
+        LOGGER.log(Level.INFO, "Filtered stock data retrieved: {0} records", sortedData.size());
+        return sortedData;
+    }
+
+    // Helper method to parse CSV row into StockData object
+    private StockData parseCsvRow(String[] data) {
+        return new StockData(
+                LocalDate.parse(data[0]),
+                Double.parseDouble(data[1]),
+                Double.parseDouble(data[2]),
+                Double.parseDouble(data[3]),
+                Double.parseDouble(data[4]),
+                Double.parseDouble(data[5]),
+                Long.parseLong(data[6])
+        );
     }
 
     // Helper method to get comparator based on sorting criteria

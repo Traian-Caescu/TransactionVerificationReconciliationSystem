@@ -23,19 +23,6 @@ public class VerificationService {
     @Value("${yahoo.finance.api.key}")
     private String yahooFinanceApiKey;
 
-    // Thresholds for validation
-    @Value("${transaction.price.min:10}")
-    private double minPrice;
-
-    @Value("${transaction.price.max:10000}")
-    private double maxPrice;
-
-    @Value("${transaction.quantity.min:1}")
-    private int minQuantity;
-
-    @Value("${transaction.quantity.max:1000}")
-    private int maxQuantity;
-
     @Autowired
     public VerificationService(TransactionRepository transactionRepository, MismatchLogRepository mismatchLogRepository, RestTemplate restTemplate) {
         this.transactionRepository = transactionRepository;
@@ -43,25 +30,26 @@ public class VerificationService {
         this.restTemplate = restTemplate;
     }
 
-    // Verify transactions with both internal and Yahoo Finance data
-    public List<MismatchLog> verifyTransactions(List<Transaction> externalTransactions, String source) {
+    // Verify transactions with internal data and Yahoo Finance data, logging mismatches
+    public List<MismatchLog> verifyTransactions(List<Transaction> externalTransactions, String source, String userRole) {
         List<MismatchLog> mismatches = new ArrayList<>();
 
         for (Transaction externalTransaction : externalTransactions) {
-            Optional<Transaction> internalTransactionOpt = transactionRepository.findByTransactionId(externalTransaction.getTransactionId());
+            Optional<Transaction> internalTransactionOpt = transactionRepository.findById(externalTransaction.getTransactionId());
 
             if (internalTransactionOpt.isPresent()) {
                 Transaction internalTransaction = internalTransactionOpt.get();
 
-                // Internal data comparison
-                checkForMismatch(internalTransaction.getTransactionId(), "price", internalTransaction.getPrice(), externalTransaction.getPrice(), source, mismatches, "Price mismatch detected");
-                checkForMismatch(internalTransaction.getTransactionId(), "quantity", internalTransaction.getQuantity(), externalTransaction.getQuantity(), source, mismatches, "Quantity mismatch detected");
-                checkForMismatch(internalTransaction.getTransactionId(), "UID", internalTransaction.getUid(), externalTransaction.getUid(), source, mismatches, "UID mismatch detected");
+                // Compare with internal data
+                checkForMismatch(internalTransaction, externalTransaction, "price", internalTransaction.getPrice(), externalTransaction.getPrice(), source, mismatches, "Price mismatch detected");
+                checkForMismatch(internalTransaction, externalTransaction, "quantity", internalTransaction.getQuantity(), externalTransaction.getQuantity(), source, mismatches, "Quantity mismatch detected");
 
-                // Yahoo Finance data comparison
-                double yahooPrice = fetchYahooFinancePrice(internalTransaction.getSymbol());
-                if (yahooPrice != -1) {
-                    checkForMismatch(internalTransaction.getTransactionId(), "yahoo_price", internalTransaction.getPrice(), yahooPrice, "Yahoo Finance", mismatches, "Yahoo Finance price mismatch detected");
+                // Compare with Yahoo Finance data if user has SENIOR role
+                if ("SENIOR".equals(userRole)) {
+                    double yahooPrice = fetchYahooFinancePrice(internalTransaction.getSymbol());
+                    if (yahooPrice != -1) {
+                        checkForMismatch(internalTransaction, externalTransaction, "yahoo_price", internalTransaction.getPrice(), yahooPrice, "Yahoo Finance", mismatches, "Yahoo Finance price mismatch detected");
+                    }
                 }
             } else {
                 mismatches.add(logMismatch(externalTransaction.getTransactionId(), "status", "missing", "new external transaction", source, "No matching internal transaction found"));
@@ -85,9 +73,9 @@ public class VerificationService {
         return -1;  // Return -1 if price not found or error occurred
     }
 
-    private void checkForMismatch(String transactionId, String field, Object internalValue, Object externalValue, String source, List<MismatchLog> mismatches, String description) {
+    private void checkForMismatch(Transaction internalTransaction, Transaction externalTransaction, String field, Object internalValue, Object externalValue, String source, List<MismatchLog> mismatches, String description) {
         if (!internalValue.equals(externalValue)) {
-            mismatches.add(logMismatch(transactionId, field, String.valueOf(internalValue), String.valueOf(externalValue), source, description));
+            mismatches.add(logMismatch(internalTransaction.getTransactionId(), field, String.valueOf(internalValue), String.valueOf(externalValue), source, description));
         }
     }
 
@@ -100,24 +88,6 @@ public class VerificationService {
     // Retrieve all mismatches for post-execution analysis
     public List<MismatchLog> getAllMismatches() {
         return mismatchLogRepository.findAll();
-    }
-
-    // Pre-execution validation for fat finger errors and range checks
-    public boolean validateTransactionPreExecution(Transaction transaction) {
-        boolean isValid = validateTransactionRange(transaction);
-
-        if (!isValid) {
-            System.out.println("Alert: Potential input error for transaction ID " + transaction.getTransactionId() +
-                    ". Check price and quantity ranges before execution.");
-        }
-
-        return isValid;
-    }
-
-    // Validate transaction data against predefined range boundaries
-    public boolean validateTransactionRange(Transaction transaction) {
-        return transaction.getPrice() >= minPrice && transaction.getPrice() <= maxPrice
-                && transaction.getQuantity() >= minQuantity && transaction.getQuantity() <= maxQuantity;
     }
 
     // Fetch mismatches specific to a transaction for reporting

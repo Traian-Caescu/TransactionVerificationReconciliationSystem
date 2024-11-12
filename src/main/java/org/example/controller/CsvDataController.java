@@ -25,7 +25,6 @@ public class CsvDataController {
         this.csvDataService = csvDataService;
     }
 
-    // Endpoint to load CSV data into the database
     @GetMapping("/load")
     public ResponseEntity<String> loadData() {
         try {
@@ -39,7 +38,6 @@ public class CsvDataController {
         }
     }
 
-    // Endpoint to retrieve filtered stock data with optional date range and sorting
     @GetMapping("/view")
     public ResponseEntity<?> getStockData(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
