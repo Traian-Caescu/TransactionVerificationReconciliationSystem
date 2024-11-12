@@ -117,10 +117,16 @@ public class ExternalTransactionService {
 
             for (JsonNode stockNode : root.path("quoteResponse").path("result")) {
                 OptionDTO stock = new OptionDTO();
-                stock.setSymbol(stockNode.path("symbol").asText());
-                stock.setLastPrice(stockNode.path("regularMarketPrice").asDouble());
-                stock.setPriceChange(stockNode.path("regularMarketChange").asDouble());
-                stock.setOptionsTotalVolume(stockNode.path("regularMarketVolume").asText());
+
+                // Add checks for missing data to prevent null values
+                stock.setSymbol(stockNode.path("symbol").asText("N/A")); // Default to "N/A" if symbol is missing
+                stock.setLastPrice(stockNode.path("regularMarketPrice").asDouble(0.0)); // Default to 0.0 if price is missing
+                stock.setPriceChange(stockNode.path("regularMarketChange").asDouble(0.0)); // Default to 0.0 if price change is missing
+                stock.setOptionsTotalVolume(stockNode.path("regularMarketVolume").asText("0")); // Default to "0" if volume is missing
+                stock.setSymbolType(stockNode.path("symbolType").asText("N/A")); // Default to "N/A" if symbol type is missing
+                stock.setSymbolName(stockNode.path("symbolName").asText("N/A")); // Default to "N/A" if symbol name is missing
+                stock.setPercentChange(stockNode.path("regularMarketChangePercent").asText("N/A")); // Default to "N/A" if percent change is missing
+
                 stockData.add(stock);
             }
 
@@ -134,6 +140,7 @@ public class ExternalTransactionService {
 
         return stockData;
     }
+
 
     /**
      * Compare transactions with fetched stock data to identify mismatches.
