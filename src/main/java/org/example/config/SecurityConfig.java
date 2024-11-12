@@ -38,10 +38,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/authenticate").permitAll()
-                // Senior role can access transaction management and reconciliation
                 .antMatchers("/data/load", "/api/reconciliation/**").hasRole("SENIOR")
-                // Junior role has limited access to view and submit transactions
-                .antMatchers("/data/view", "/api/transactions/create").hasAnyRole("JUNIOR", "SENIOR") // Allow both roles to view
+                .antMatchers("/data/view", "/api/transactions/create").hasAnyRole("JUNIOR", "SENIOR")
                 .antMatchers("/api/transactions/**").hasAnyRole("JUNIOR", "SENIOR")
                 .anyRequest().authenticated()
                 .and()
@@ -65,7 +63,6 @@ public class SecurityConfig {
                 .invalidateHttpSession(true);
         return http.build();
     }
-
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {

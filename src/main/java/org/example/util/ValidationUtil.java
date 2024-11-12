@@ -9,5 +9,4 @@ public class ValidationUtil {
                 && transaction.getQuantity() >= minQuantity && transaction.getQuantity() <= maxQuantity;
     }
 
-    // Additional validation methods can be added here (e.g., validate UID format, asset class constraints, etc.)
 }

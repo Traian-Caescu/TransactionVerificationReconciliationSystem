@@ -8,7 +8,8 @@ import org.example.service.AlertService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,6 @@ public class TransactionController {
         this.alertService = alertService;
     }
 
-
     @PostMapping
     public ResponseEntity<?> createTransaction(@RequestBody TransactionDTO transactionDTO) {
         Transaction transaction = new Transaction(
@@ -33,7 +33,7 @@ public class TransactionController {
                 transactionDTO.getUid(),
                 transactionDTO.getPrice(),
                 transactionDTO.getQuantity(),
-                transactionDTO.getTransactionStatusEnum(), // Convert String to enum
+                transactionDTO.getTransactionStatusEnum(),
                 transactionDTO.getSymbol()
         );
 
@@ -65,7 +65,7 @@ public class TransactionController {
                         transaction.getPrice(),
                         transaction.getQuantity(),
                         transaction.getUid(),
-                        transaction.getStatus(), // Enum passed to DTO constructor
+                        transaction.getStatus(),
                         transaction.getSymbol()
                 ))
                 .collect(Collectors.toList());
@@ -82,7 +82,7 @@ public class TransactionController {
                 transactionDTO.getUid(),
                 transactionDTO.getPrice(),
                 transactionDTO.getQuantity(),
-                transactionDTO.getTransactionStatusEnum(), // Convert String to enum
+                transactionDTO.getTransactionStatusEnum(),
                 transactionDTO.getSymbol()
         );
 

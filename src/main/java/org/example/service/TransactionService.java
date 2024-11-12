@@ -148,7 +148,6 @@ public class TransactionService {
 
     // Pre-execution validation stub
     public boolean validateTransactionPreExecution(Transaction transaction) {
-        // Implement the actual logic for pre-execution validation if needed
-        return true; // Assuming true for simplicity
+        return true; // Assume true for simplicity - logic long-term
     }
 }

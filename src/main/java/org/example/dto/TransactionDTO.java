@@ -24,67 +24,41 @@ public class TransactionDTO {
     private String uid;
 
     @NotBlank(message = "Status is mandatory")
-    @Size(message = "Status cannot exceed 20 characters")
+    @Size(max = 20, message = "Status cannot exceed 20 characters")
     private String status;
 
     private String assetClass; // Optional asset class field for categorization
-    private String strategy; // Optional field for strategy used in the transaction
-    private String symbol; // Add this field for symbol compatibility with verification
+    private String strategy;   // Optional field for strategy used in the transaction
+    private String symbol;     // Field for symbol compatibility with verification
 
-    // Constructors
+    // Default constructor
     public TransactionDTO() {}
 
+    // Parameterized constructor
     public TransactionDTO(String transactionId, Double price, Integer quantity, String uid, TransactionStatus status, String symbol) {
         this.transactionId = transactionId;
         this.price = price;
         this.quantity = quantity;
         this.uid = uid;
-        this.status = status != null ? status.name() : null; // Store enum as String
+        this.status = status != null ? status.name() : null;
         this.symbol = symbol;
     }
 
-    // Getters and Setters
-    public String getTransactionId() {
-        return transactionId;
-    }
+    // Getters and setters
+    public String getTransactionId() { return transactionId; }
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
 
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
+    public Double getPrice() { return price; }
+    public void setPrice(Double price) { this.price = price; }
 
-    public Double getPrice() {
-        return price;
-    }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
-    public void setPrice(Double price) {
-        this.price = price;
-    }
+    public String getUid() { return uid; }
+    public void setUid(String uid) { this.uid = uid; }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     // Method to convert to TransactionStatus enum
     public TransactionStatus getTransactionStatusEnum() {
@@ -95,27 +69,12 @@ public class TransactionDTO {
         }
     }
 
-    public String getAssetClass() {
-        return assetClass;
-    }
+    public String getAssetClass() { return assetClass; }
+    public void setAssetClass(String assetClass) { this.assetClass = assetClass; }
 
-    public void setAssetClass(String assetClass) {
-        this.assetClass = assetClass;
-    }
+    public String getStrategy() { return strategy; }
+    public void setStrategy(String strategy) { this.strategy = strategy; }
 
-    public String getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(String strategy) {
-        this.strategy = strategy;
-    }
-
-    public String getSymbol() {
-        return symbol;
-    }
-
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
-    }
+    public String getSymbol() { return symbol; }
+    public void setSymbol(String symbol) { this.symbol = symbol; }
 }
