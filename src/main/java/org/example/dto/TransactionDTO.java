@@ -7,6 +7,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
+/**
+ * Data Transfer Object for Transactions.
+ * Holds details about a transaction, including price, quantity, UID, status, and symbol.
+ */
 public class TransactionDTO {
 
     @NotBlank(message = "Transaction ID is mandatory")
@@ -27,14 +31,23 @@ public class TransactionDTO {
     @Size(max = 20, message = "Status cannot exceed 20 characters")
     private String status;
 
-    private String assetClass; // Optional asset class field for categorization
-    private String strategy;   // Optional field for strategy used in the transaction
-    private String symbol;     // Field for symbol compatibility with verification
+    private String assetClass; // Optional field for asset class categorization
+    private String strategy;   // Optional field for strategy associated with the transaction
+    private String symbol;     // Symbol associated with the transaction
 
     // Default constructor
     public TransactionDTO() {}
 
-    // Parameterized constructor
+    /**
+     * Parameterized constructor for TransactionDTO.
+     *
+     * @param transactionId the unique identifier for the transaction.
+     * @param price         the price associated with the transaction.
+     * @param quantity      the quantity associated with the transaction.
+     * @param uid           the unique identifier for the transaction entity.
+     * @param status        the status of the transaction, as an enum.
+     * @param symbol        the symbol associated with the transaction.
+     */
     public TransactionDTO(String transactionId, Double price, Integer quantity, String uid, TransactionStatus status, String symbol) {
         this.transactionId = transactionId;
         this.price = price;
@@ -45,22 +58,51 @@ public class TransactionDTO {
     }
 
     // Getters and setters
-    public String getTransactionId() { return transactionId; }
-    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+    public String getTransactionId() {
+        return transactionId;
+    }
 
-    public Double getPrice() { return price; }
-    public void setPrice(Double price) { this.price = price; }
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
 
-    public Integer getQuantity() { return quantity; }
-    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public Double getPrice() {
+        return price;
+    }
 
-    public String getUid() { return uid; }
-    public void setUid(String uid) { this.uid = uid; }
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Integer getQuantity() {
+        return quantity;
+    }
 
-    // Method to convert to TransactionStatus enum
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     * Converts the status field to the TransactionStatus enum.
+     *
+     * @return the status as a TransactionStatus enum.
+     */
     public TransactionStatus getTransactionStatusEnum() {
         try {
             return TransactionStatus.valueOf(status.toUpperCase());
@@ -69,12 +111,46 @@ public class TransactionDTO {
         }
     }
 
-    public String getAssetClass() { return assetClass; }
-    public void setAssetClass(String assetClass) { this.assetClass = assetClass; }
+    public String getAssetClass() {
+        return assetClass;
+    }
 
-    public String getStrategy() { return strategy; }
-    public void setStrategy(String strategy) { this.strategy = strategy; }
+    public void setAssetClass(String assetClass) {
+        this.assetClass = assetClass;
+    }
 
-    public String getSymbol() { return symbol; }
-    public void setSymbol(String symbol) { this.symbol = symbol; }
+    public String getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(String strategy) {
+        this.strategy = strategy;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    /**
+     * Provides a string representation of TransactionDTO for logging and debugging.
+     *
+     * @return formatted string representation of TransactionDTO instance.
+     */
+    @Override
+    public String toString() {
+        return "TransactionDTO{" +
+                "transactionId='" + transactionId + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", uid='" + uid + '\'' +
+                ", status='" + status + '\'' +
+                ", assetClass='" + assetClass + '\'' +
+                ", strategy='" + strategy + '\'' +
+                ", symbol='" + symbol + '\'' +
+                '}';
+    }
 }

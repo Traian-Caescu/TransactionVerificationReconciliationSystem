@@ -5,6 +5,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+/**
+ * Entity representing a transaction.
+ * Stores details such as transaction ID, UID, price, quantity, status, and related information.
+ */
 @Entity
 @Table(name = "transactions")
 public class Transaction {
@@ -31,8 +35,21 @@ public class Transaction {
     private String strategy;
     private String symbol;
 
+    /**
+     * Default constructor.
+     */
     public Transaction() {}
 
+    /**
+     * Parameterized constructor for creating a new transaction.
+     *
+     * @param transactionId the unique transaction ID.
+     * @param uid           the user ID associated with the transaction.
+     * @param price         the price of the transaction.
+     * @param quantity      the quantity of the transaction.
+     * @param status        the current status of the transaction.
+     * @param symbol        the symbol of the asset involved in the transaction.
+     */
     public Transaction(String transactionId, String uid, double price, int quantity, TransactionStatus status, String symbol) {
         this.transactionId = transactionId;
         this.uid = uid;
@@ -105,5 +122,24 @@ public class Transaction {
 
     public void setSymbol(String symbol) {
         this.symbol = symbol;
+    }
+
+    /**
+     * Provides a string representation of the transaction for logging and debugging purposes.
+     *
+     * @return a formatted string representation of the transaction.
+     */
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "transactionId='" + transactionId + '\'' +
+                ", uid='" + uid + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", status=" + status +
+                ", assetClass='" + assetClass + '\'' +
+                ", strategy='" + strategy + '\'' +
+                ", symbol='" + symbol + '\'' +
+                '}';
     }
 }

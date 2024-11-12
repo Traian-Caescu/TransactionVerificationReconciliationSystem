@@ -12,12 +12,21 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for handling authentication-related endpoints.
+ * Manages user login attempts and provides error handling for failed logins.
+ */
 @RestController
 @RequestMapping("/api")
 public class AuthController {
 
     private static final Logger LOGGER = Logger.getLogger(AuthController.class.getName());
 
+    /**
+     * Endpoint for authenticating users. Always returns a success response for simplicity.
+     *
+     * @return a JSON object with status, message, and timestamp of the login attempt.
+     */
     @PostMapping("/authenticate")
     public ResponseEntity<Map<String, Object>> authenticate() {
         Map<String, Object> response = new HashMap<>();
@@ -27,7 +36,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    // Error handling for unauthorized or failed login attempts
+    /**
+     * Global error handler for login-related exceptions. Logs errors and returns a user-friendly message.
+     *
+     * @param ex the exception that occurred.
+     * @return a response entity with failure status and error message.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleLoginError(Exception ex) {
         LOGGER.log(Level.WARNING, "Login attempt failed", ex);

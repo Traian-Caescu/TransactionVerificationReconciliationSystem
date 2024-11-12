@@ -21,6 +21,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+/**
+ * Controller for handling transaction reconciliation and mismatch verification.
+ * Supports transaction verification and mismatch logging.
+ */
 @Controller
 @RequestMapping("/api/reconciliation")
 public class ReconciliationController {
@@ -32,6 +36,14 @@ public class ReconciliationController {
     private final ExternalTransactionService externalTransactionService;
     private final TransactionService transactionService;
 
+    /**
+     * Constructor to initialize services.
+     *
+     * @param verificationService       service for transaction verification.
+     * @param alertService              service for alert generation.
+     * @param externalTransactionService service for fetching external data (e.g., stock data).
+     * @param transactionService        service for transaction management.
+     */
     @Autowired
     public ReconciliationController(VerificationService verificationService, AlertService alertService, ExternalTransactionService externalTransactionService, TransactionService transactionService) {
         this.verificationService = verificationService;
@@ -40,6 +52,12 @@ public class ReconciliationController {
         this.transactionService = transactionService;
     }
 
+    /**
+     * Verifies transactions against internal and external data.
+     *
+     * @param externalTransactions list of external transactions to verify.
+     * @return verification response containing mismatch details or a success message.
+     */
     @PostMapping("/verify")
     public ResponseEntity<VerificationResponse> verifyTransactions(@RequestBody List<TransactionDTO> externalTransactions) {
         List<Transaction> transactions = externalTransactions.stream()
@@ -67,6 +85,12 @@ public class ReconciliationController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Retrieves all mismatches in the system.
+     * Accessible only by users with SENIOR role.
+     *
+     * @return response entity containing the list of mismatches.
+     */
     @GetMapping("/mismatches")
     @PreAuthorize("hasRole('SENIOR')")
     public ResponseEntity<List<MismatchLog>> getAllMismatches() {
@@ -74,6 +98,12 @@ public class ReconciliationController {
         return ResponseEntity.ok(mismatches);
     }
 
+    /**
+     * Retrieves mismatches for a specific transaction by its ID.
+     *
+     * @param transactionId ID of the transaction.
+     * @return response entity with mismatches or not found status.
+     */
     @GetMapping("/mismatches/{transactionId}")
     @PreAuthorize("hasRole('SENIOR')")
     public ResponseEntity<?> getMismatchesByTransactionId(@PathVariable String transactionId) {
@@ -84,6 +114,12 @@ public class ReconciliationController {
         return ResponseEntity.ok(mismatches);
     }
 
+    /**
+     * Fetches the most active options from Yahoo Finance.
+     * Accessible only by users with SENIOR role.
+     *
+     * @return response entity containing a list of most active options.
+     */
     @GetMapping("/active-options")
     @PreAuthorize("hasRole('SENIOR')")
     public ResponseEntity<List<OptionDTO>> getMostActiveOptions() {
@@ -92,7 +128,12 @@ public class ReconciliationController {
         return ResponseEntity.ok(activeOptions);
     }
 
-    // Helper method to convert status from String to TransactionStatus enum
+    /**
+     * Converts a string status to a TransactionStatus enum.
+     *
+     * @param status the status string to convert.
+     * @return the corresponding TransactionStatus enum.
+     */
     private TransactionStatus convertStatus(String status) {
         try {
             return TransactionStatus.valueOf(status.toUpperCase());
@@ -101,6 +142,9 @@ public class ReconciliationController {
         }
     }
 
+    /**
+     * Inner class to structure verification response with message and mismatches.
+     */
     public static class VerificationResponse {
         private String message;
         private List<MismatchLog> mismatches;

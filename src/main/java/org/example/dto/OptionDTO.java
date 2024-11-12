@@ -4,6 +4,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+/**
+ * Data Transfer Object for Options information.
+ * Holds details about stock options, such as symbol, last price, and volume.
+ */
 public class OptionDTO {
 
     @NotBlank(message = "Symbol is mandatory")
@@ -15,7 +19,7 @@ public class OptionDTO {
     @NotBlank(message = "Symbol name is mandatory")
     private String symbolName;
 
-    private String hasOptions; // Boolean represented as "Yes" or "No"
+    private String hasOptions; // Indicates if options are available, represented as "Yes" or "No".
 
     @NotNull(message = "Last price is required")
     @Positive(message = "Last price must be a positive value")
@@ -35,7 +39,19 @@ public class OptionDTO {
     // Default constructor
     public OptionDTO() {}
 
-    // Parameterized constructor
+    /**
+     * Parameterized constructor for OptionDTO.
+     *
+     * @param symbol               the option symbol.
+     * @param symbolType           the type of symbol.
+     * @param symbolName           the name of the symbol.
+     * @param hasOptions           indicates if options are available.
+     * @param lastPrice            the last recorded price of the option.
+     * @param priceChange          the price change of the option.
+     * @param percentChange        the percentage change of the option price.
+     * @param optionsTotalVolume   the total options volume.
+     * @param optionsCallVolumePercent the percentage of call volume in total volume.
+     */
     public OptionDTO(String symbol, String symbolType, String symbolName, String hasOptions,
                      double lastPrice, double priceChange, String percentChange,
                      String optionsTotalVolume, String optionsCallVolumePercent) {
@@ -147,23 +163,11 @@ public class OptionDTO {
         this.peRatio = peRatio;
     }
 
-    public double getPrice() {
-        return lastPrice;
-    }
-
-    public void setPrice(double price) {
-        this.lastPrice = price;
-    }
-
-    public double getChange() {
-        return priceChange;
-    }
-
-    public void setChange(double change) {
-        this.priceChange = change;
-    }
-
-    // Override toString() method for better logging
+    /**
+     * Override toString() method for improved logging of OptionDTO instances.
+     *
+     * @return formatted string representation of the OptionDTO instance.
+     */
     @Override
     public String toString() {
         return "OptionDTO{" +

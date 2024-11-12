@@ -5,6 +5,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing a log entry for mismatches in transactions.
+ * Stores details about the mismatch, including transaction ID, field, source, and timestamps.
+ */
 @Entity
 @Table(name = "mismatch_logs")
 public class MismatchLog {
@@ -30,10 +34,23 @@ public class MismatchLog {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
+    /**
+     * Default constructor initializing the timestamp to the current time.
+     */
     public MismatchLog() {
         this.timestamp = LocalDateTime.now();
     }
 
+    /**
+     * Parameterized constructor to initialize a mismatch log entry.
+     *
+     * @param transactionId the ID of the transaction related to the mismatch.
+     * @param field         the field in which the mismatch occurred.
+     * @param internalValue the expected internal value.
+     * @param externalValue the actual external value found.
+     * @param source        the source of the mismatch.
+     * @param description   a description of the mismatch.
+     */
     public MismatchLog(String transactionId, String field, String internalValue, String externalValue, String source, String description) {
         this.transactionId = transactionId;
         this.field = field;
@@ -103,5 +120,24 @@ public class MismatchLog {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
+    }
+
+    /**
+     * Provides a string representation of the mismatch log entry for logging and debugging.
+     *
+     * @return formatted string representation of the mismatch log entry.
+     */
+    @Override
+    public String toString() {
+        return "MismatchLog{" +
+                "id=" + id +
+                ", transactionId='" + transactionId + '\'' +
+                ", field='" + field + '\'' +
+                ", internalValue='" + internalValue + '\'' +
+                ", externalValue='" + externalValue + '\'' +
+                ", source='" + source + '\'' +
+                ", description='" + description + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }

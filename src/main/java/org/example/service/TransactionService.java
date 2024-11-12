@@ -3,8 +3,8 @@ package org.example.service;
 import org.example.model.MismatchLog;
 import org.example.model.Transaction;
 import org.example.model.TransactionStatus;
-import org.example.repository.TransactionRepository;
 import org.example.repository.MismatchLogRepository;
+import org.example.repository.TransactionRepository;
 import org.example.util.ValidationUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +15,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service class responsible for handling transaction-related operations,
+ * including saving, updating, deleting, and validating transactions.
+ */
 @Service
 public class TransactionService {
 
@@ -41,8 +45,12 @@ public class TransactionService {
         this.alertService = alertService;
     }
 
-
-    // Save a new transaction with role-specific validation, alerting, and status setting
+    /**
+     * Saves a new transaction after validating it based on user role.
+     *
+     * @param transaction The transaction to be saved.
+     * @return The saved transaction.
+     */
     public Transaction saveTransaction(Transaction transaction) {
         String userRole = getUserRole();
         boolean isValid = validateTransaction(transaction, userRole);
@@ -58,7 +66,12 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    // Retrieve a transaction by ID with optional alerting
+    /**
+     * Retrieves a transaction by its ID.
+     *
+     * @param transactionId The ID of the transaction.
+     * @return The transaction if found, otherwise empty.
+     */
     public Optional<Transaction> getTransactionById(String transactionId) {
         Optional<Transaction> transaction = transactionRepository.findById(transactionId);
         transaction.ifPresentOrElse(
@@ -68,12 +81,22 @@ public class TransactionService {
         return transaction;
     }
 
-    // Retrieve all transactions
+    /**
+     * Retrieves all transactions from the repository.
+     *
+     * @return A list of all transactions.
+     */
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
 
-    // Update an existing transaction with role-specific validation, alerting, and status updating
+    /**
+     * Updates an existing transaction after validating it.
+     *
+     * @param transactionId         The ID of the transaction to be updated.
+     * @param updatedTransaction    The updated transaction data.
+     * @return The updated transaction if successful, otherwise null.
+     */
     public Transaction updateTransaction(String transactionId, Transaction updatedTransaction) {
         String userRole = getUserRole();
         boolean isValid = validateTransaction(updatedTransaction, userRole);
@@ -96,7 +119,12 @@ public class TransactionService {
                 .orElse(null);
     }
 
-    // Delete a transaction by ID with alerting
+    /**
+     * Deletes a transaction by its ID.
+     *
+     * @param transactionId The ID of the transaction to be deleted.
+     * @return true if the transaction was deleted, false if not found.
+     */
     public boolean deleteTransaction(String transactionId) {
         Optional<Transaction> transaction = transactionRepository.findById(transactionId);
         if (transaction.isPresent()) {
@@ -108,7 +136,13 @@ public class TransactionService {
         return false;
     }
 
-    // Role-based validation for transactions
+    /**
+     * Validates a transaction based on its price, quantity, and user role.
+     *
+     * @param transaction The transaction to be validated.
+     * @param userRole    The role of the user performing the operation.
+     * @return true if the transaction is valid, false otherwise.
+     */
     private boolean validateTransaction(Transaction transaction, String userRole) {
         if ("SENIOR".equals(userRole)) {
             return ValidationUtil.validateTransactionRange(transaction, minPrice, maxPrice, minQuantity, maxQuantity);
@@ -120,7 +154,12 @@ public class TransactionService {
         return false;
     }
 
-    // Log rejected transactions in the mismatch table with specific rejection reason
+    /**
+     * Logs rejected transactions in the mismatch table with a specific rejection reason.
+     *
+     * @param transaction The rejected transaction.
+     * @param description A description of why the transaction was rejected.
+     */
     private void logRejectedTransaction(Transaction transaction, String description) {
         MismatchLog mismatchLog = new MismatchLog(
                 transaction.getTransactionId(),
@@ -133,7 +172,11 @@ public class TransactionService {
         mismatchLogRepository.save(mismatchLog);
     }
 
-    // Helper method to retrieve the role of the currently authenticated user
+    /**
+     * Retrieves the role of the currently authenticated user.
+     *
+     * @return The role of the authenticated user.
+     */
     public String getUserRole() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
@@ -141,12 +184,17 @@ public class TransactionService {
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("User has no roles"))
                     .getAuthority()
-                    .replace("ROLE_", "");
+                    .replace("ROLE_", ""); // Remove "ROLE_" prefix
         }
         return "UNKNOWN";
     }
 
-    // Pre-execution validation stub
+    /**
+     * Pre-execution validation for a transaction. This method can be extended with more logic as required.
+     *
+     * @param transaction The transaction to be validated.
+     * @return true for now as it assumes validation passes.
+     */
     public boolean validateTransactionPreExecution(Transaction transaction) {
         return true; // Assume true for simplicity - logic long-term
     }

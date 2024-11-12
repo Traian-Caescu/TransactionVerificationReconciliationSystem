@@ -21,6 +21,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Service for interacting with external APIs to fetch financial data,
+ * including most active options and stock data, as well as comparing stock
+ * data to transaction records.
+ */
 @Service
 public class ExternalTransactionService {
 
@@ -36,7 +41,12 @@ public class ExternalTransactionService {
         this.objectMapper = new ObjectMapper();
     }
 
-    // Fetch most active options based on the current user's role
+    /**
+     * Fetch the most active options based on the current user's role.
+     * Only accessible by SENIOR role.
+     *
+     * @return List of OptionDTO containing most active options.
+     */
     public List<OptionDTO> fetchMostActiveOptions() {
         String userRole = getUserRole();
         if (!"SENIOR".equals(userRole)) {
@@ -77,7 +87,13 @@ public class ExternalTransactionService {
         return options;
     }
 
-    // Fetch stock data for a list of symbols based on the user's role
+    /**
+     * Fetch stock data for a list of symbols based on the user's role.
+     * Only accessible by SENIOR role.
+     *
+     * @param symbols List of stock symbols.
+     * @return List of OptionDTO containing stock data.
+     */
     public List<OptionDTO> fetchStockData(List<String> symbols) {
         String userRole = getUserRole();
         if (!"SENIOR".equals(userRole)) {
@@ -119,7 +135,12 @@ public class ExternalTransactionService {
         return stockData;
     }
 
-    // Compare transactions with stock data to identify mismatches
+    /**
+     * Compare transactions with fetched stock data to identify mismatches.
+     *
+     * @param transactions List of transactions to compare.
+     * @return List of mismatch messages indicating discrepancies.
+     */
     public List<String> compareWithStockData(List<Transaction> transactions) {
         List<String> mismatches = new ArrayList<>();
         List<String> symbols = new ArrayList<>();
@@ -145,7 +166,11 @@ public class ExternalTransactionService {
         return mismatches;
     }
 
-    // Helper method to retrieve the role of the currently authenticated user
+    /**
+     * Helper method to retrieve the role of the currently authenticated user.
+     *
+     * @return The role of the current user.
+     */
     private String getUserRole() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
