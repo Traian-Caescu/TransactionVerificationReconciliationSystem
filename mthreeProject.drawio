@@ -1,0 +1,143 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36" version="24.8.4">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="2049" dy="1103" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-3" value="Transaction" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="120" y="50" width="230" height="360" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-4" value="- transactionId: String&#xa;- uid: String&#xa;- price: double&#xa;- quantity: int&#xa;- status: TransactionStatus&#xa;- assetClass: String&#xa;- strategy: String&#xa;- symbol:String&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-3">
+          <mxGeometry y="26" width="230" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-5" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-3">
+          <mxGeometry y="150" width="230" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-6" value="+ getTransactionId(): String&#xa;+ setTransactionId(transactionId: String) &#xa;+ getUid(): String &#xa;+ setUid(uid: String) &#xa;+ getPrice(): double &#xa;+ setPrice(price: double) &#xa;+ getQuantity(): int &#xa;+ setQuantity(quantity: int)&#xa;+ getStatus(): TransactionStatus &#xa;+ setStatus(status: TransactionStatus) &#xa;+ getSymbol(): String &#xa;+ setSymbol(symbol: String)" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-3">
+          <mxGeometry y="158" width="230" height="202" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-7" value="MismatchLog" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="595" y="30" width="250" height="420" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-8" value="- id: Long &#xa;- transactionId: String &#xa;- field: String &#xa;- internalValue: String&#xa;- externalValue: String &#xa;- source: String &#xa;- description: String &#xa;- timestamp: LocalDateTime&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-7">
+          <mxGeometry y="26" width="250" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-9" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-7">
+          <mxGeometry y="150" width="250" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-10" value="+ getId(): Long &#xa;+ setId(id: Long) &#xa;+ getTransactionId(): String &#xa;+ setTransactionId(transactionId: String) &#xa;+ getField(): String &#xa;+ setField(field: String) &#xa;+ getInternalValue(): String &#xa;+ setInternalValue(internalValue: String) &#xa;+ getExternalValue(): String &#xa;+ setExternalValue(externalValue: String) &#xa;+ getSource(): String &#xa;+ setSource(source: String) &#xa;+ getDescription(): String &#xa;+ setDescription(description: String) &#xa;+ getTimestamp(): LocalDateTime &#xa;+ setTimestamp(timestamp: LocalDateTime)" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-7">
+          <mxGeometry y="158" width="250" height="262" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-40" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" target="IyW0sXbmYoFLpCn2U-e0-31">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="460" y="1040" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-17" value="VerificationService" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="15" y="940" width="440" height="290" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-18" value="- transactionRepository: TransactionRepository&#xa;- mismatchLogRepository: MismatchLogRepository&#xa;&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-17">
+          <mxGeometry y="26" width="440" height="94" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-19" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-17">
+          <mxGeometry y="120" width="440" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-20" value="+ verifyTransactions(transactions: List&lt;Transaction&gt;, &#xa;    source: String, &#xa;    userRole: String): List&lt;MismatchLog&gt; &#xa;+ getAllMismatches(): List&lt;MismatchLog&gt; &#xa;+ getVerificationSummary(): Map&lt;String, Long&gt; &#xa;+ getMismatchesByTransactionId(transactionId: String): List&lt;MismatchLog&gt; &#xa;+ compareWithStockData(transactions: List&lt;Transaction&gt;): List&lt;String&gt; &#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-17">
+          <mxGeometry y="128" width="440" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-37" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="IyW0sXbmYoFLpCn2U-e0-21" target="IyW0sXbmYoFLpCn2U-e0-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-21" value="TransactionController" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="55" y="510" width="360" height="204" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-22" value="&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-21">
+          <mxGeometry y="26" width="360" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-23" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-21">
+          <mxGeometry y="70" width="360" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-24" value="+ createTransaction(transactionDTO: TransactionDTO): &#xa;    ResponseEntity&#xa;+ getAllTransactions(): ResponseEntity&lt;List&lt;TransactionDTO&gt;&gt; &#xa;+ updateTransaction(transactionId: String, &#xa;    transactionDTO: TransactionDTO): ResponseEntity&#xa;+ deleteTransaction(transactionId: String): ResponseEntity" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-21">
+          <mxGeometry y="78" width="360" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-26" value="AlertSerice" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="620" y="549" width="360" height="204" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-27" value="- mismatchLogRepository: MismatchLogRepository" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-26">
+          <mxGeometry y="26" width="360" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-28" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-26">
+          <mxGeometry y="70" width="360" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-29" value="+ generateAlertsForTransaction(transactionId: String): &#xa;    List&lt;String&gt; &#xa;+ generateAdminAlerts(): List&lt;String&gt; &#xa;+ generateMismatchSummary(): String &#xa;+ preExecutionAlert(transactionId: String, &#xa;    message: String): void &#xa;+ logRejectedTransaction(transactionId: String, &#xa;field: String, internalValue: String, source: String): void " style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-26">
+          <mxGeometry y="78" width="360" height="126" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-30" value="StockInfoController" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="590" y="980" width="360" height="150" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-32" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-30">
+          <mxGeometry y="26" width="360" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-31" value="&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-30">
+          <mxGeometry y="34" width="360" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-33" value="+ getStockInfo(symbol: String): ResponseEntity&lt;String&gt; " style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-30">
+          <mxGeometry y="78" width="360" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-35" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.005;entryY=0.653;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=12;startSize=8;endSize=8;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="IyW0sXbmYoFLpCn2U-e0-4" target="IyW0sXbmYoFLpCn2U-e0-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-41" value="YahooFinanceService" style="swimlane;fontStyle=2;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeLast=0;collapsible=1;marginBottom=0;rounded=0;shadow=0;strokeWidth=1;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="1030" y="990" width="360" height="150" as="geometry">
+            <mxRectangle x="230" y="140" width="160" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-42" value="" style="line;html=1;strokeWidth=1;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-41">
+          <mxGeometry y="26" width="360" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-43" value="&#xa;" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-41">
+          <mxGeometry y="34" width="360" height="44" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-44" value="+ getStockInfo()" style="text;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IyW0sXbmYoFLpCn2U-e0-41">
+          <mxGeometry y="78" width="360" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-47" value="" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=12;curved=1;exitX=0.492;exitY=0.984;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="IyW0sXbmYoFLpCn2U-e0-24" target="IyW0sXbmYoFLpCn2U-e0-17">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="440" y="780" as="sourcePoint" />
+            <mxPoint x="600" y="780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-48" value="1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="359" y="101" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-49" value="*" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
+          <mxGeometry x="560" y="101" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-50" value="" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=12;curved=1;exitX=1;exitY=0.727;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="IyW0sXbmYoFLpCn2U-e0-31" target="IyW0sXbmYoFLpCn2U-e0-43">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="455" y="1430" as="sourcePoint" />
+            <mxPoint x="458" y="1658" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IyW0sXbmYoFLpCn2U-e0-52" value="" style="endArrow=open;endSize=12;dashed=1;html=1;rounded=0;fontSize=12;curved=1;exitX=0.998;exitY=0.094;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="IyW0sXbmYoFLpCn2U-e0-24" target="IyW0sXbmYoFLpCn2U-e0-27">
+          <mxGeometry width="160" relative="1" as="geometry">
+            <mxPoint x="490" y="712" as="sourcePoint" />
+            <mxPoint x="493" y="940" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
