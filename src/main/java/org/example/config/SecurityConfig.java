@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/authenticate").permitAll()
+                .antMatchers("/api/statistics/**").permitAll()  // Allow public access to statistics
                 .antMatchers("/data/load", "/api/reconciliation/**").hasRole("SENIOR")
                 .antMatchers("/data/view", "/api/transactions/create").hasAnyRole("JUNIOR", "SENIOR")
                 .antMatchers("/api/transactions/**").hasAnyRole("JUNIOR", "SENIOR")
@@ -61,8 +62,10 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout=true")
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true);
+
         return http.build();
     }
+
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {

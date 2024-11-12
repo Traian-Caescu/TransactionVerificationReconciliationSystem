@@ -9,9 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VerificationService {
@@ -59,6 +58,27 @@ public class VerificationService {
         return mismatches;
     }
 
+    // Fetch all mismatches
+    public List<MismatchLog> getAllMismatches() {
+        return mismatchLogRepository.findAll();
+    }
+
+    // Generate verification summary
+    public Map<String, Long> getVerificationSummary() {
+        return mismatchLogRepository.findAll().stream()
+                .collect(Collectors.groupingBy(MismatchLog::getField, Collectors.counting()));
+    }
+
+    // Fetch all transaction mismatches
+    public List<MismatchLog> getAllTransactionMismatches() {
+        return mismatchLogRepository.findAll();  // Returns all mismatch logs for transactions
+    }
+
+    // Fetch mismatches specific to a transaction ID
+    public List<MismatchLog> getMismatchesByTransactionId(String transactionId) {
+        return mismatchLogRepository.findByTransactionId(transactionId);
+    }
+
     // Fetch stock price from Yahoo Finance API
     private double fetchYahooFinancePrice(String symbol) {
         try {
@@ -83,29 +103,6 @@ public class VerificationService {
         MismatchLog mismatchLog = new MismatchLog(transactionId, field, internalValue, externalValue, source, description);
         mismatchLogRepository.save(mismatchLog);  // Save mismatch to the database
         return mismatchLog;  // Return the logged mismatch
-    }
-
-    // Retrieve all mismatches for post-execution analysis
-    public List<MismatchLog> getAllMismatches() {
-        return mismatchLogRepository.findAll();
-    }
-
-    // Fetch mismatches specific to a transaction for reporting
-    public List<MismatchLog> getMismatchesByTransactionId(String transactionId) {
-        return mismatchLogRepository.findByTransactionId(transactionId);
-    }
-
-    // Generate a detailed mismatch report, providing a breakdown by source
-    public void generateDetailedMismatchReport() {
-        List<MismatchLog> mismatches = getAllMismatches();
-        System.out.println("==== Mismatch Report ====");
-        mismatches.forEach(mismatch -> System.out.println(
-                "Transaction ID: " + mismatch.getTransactionId() +
-                        ", Field: " + mismatch.getField() +
-                        ", Internal Value: " + mismatch.getInternalValue() +
-                        ", External Value: " + mismatch.getExternalValue() +
-                        ", Source: " + mismatch.getSource()
-        ));
     }
 
     // Inner classes to handle Yahoo Finance API response structure

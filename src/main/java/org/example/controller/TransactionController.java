@@ -2,29 +2,33 @@ package org.example.controller;
 
 import org.example.dto.TransactionDTO;
 import org.example.model.Transaction;
-import org.example.model.TransactionStatus;
 import org.example.service.TransactionService;
 import org.example.service.AlertService;
+import org.example.service.VerificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
+@Controller
 @RequestMapping("/api/transactions")
 public class TransactionController {
 
     private final TransactionService transactionService;
     private final AlertService alertService;
+    private final VerificationService verificationService;
 
     @Autowired
-    public TransactionController(TransactionService transactionService, AlertService alertService) {
+    public TransactionController(TransactionService transactionService, AlertService alertService, VerificationService verificationService) {
         this.transactionService = transactionService;
         this.alertService = alertService;
+        this.verificationService = verificationService;
     }
+
 
     @PostMapping
     public ResponseEntity<?> createTransaction(@RequestBody TransactionDTO transactionDTO) {

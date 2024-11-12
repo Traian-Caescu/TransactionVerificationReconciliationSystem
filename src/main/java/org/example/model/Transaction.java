@@ -13,7 +13,7 @@ public class Transaction {
     @NotBlank(message = "Transaction ID is required")
     private String transactionId;
 
-    @NotBlank(message = "UID is required")
+    @Column(name = "uid", nullable = false, unique = true)
     private String uid;
 
     @NotNull(message = "Price is required")
