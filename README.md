@@ -8,7 +8,7 @@ This project allows **junior** and **senior** users to manage transactions, hand
 
 ## Features
 
-- **Transaction Management**: Create, update, view, and delete transactions.
+- **Transaction Management**: Create, update, view, and delete transactions. 
 - **Reconciliation**: Verify transactions, detect mismatches, and compare with external sources.
 - **Stock Data Integration**: Fetch stock information from Yahoo Finance API and compare it with transaction data.
 - **Role-Based Access Control**: Different levels of access for junior and senior users.
