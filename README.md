@@ -1,6 +1,6 @@
 # Transaction Verification & Reconciliation System
 
-## Overview
+## Overview 
 
 The **Transaction Verification & Reconciliation System** is a Spring Boot application designed to handle the verification, reconciliation, and management of transactions in a financial system. It ensures that all transactions are validated, reconciled, and compared with external data sources, such as stock prices from the Yahoo Finance API. The system provides role-based access control, enabling users with different levels of permissions to access and modify transaction data.
 
