@@ -17,7 +17,7 @@ This project allows **junior** and **senior** users to manage transactions, hand
 - **Mismatch Summary**: Generate a summary of all detected mismatches.
 
 ## Technologies
-
+ 
 - **Spring Boot**: The main framework for building the application.
 - **Spring Security**: For implementing authentication and role-based authorization.
 - **JPA (Java Persistence API)**: For interacting with the MySQL database.
