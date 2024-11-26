@@ -14,7 +14,7 @@ This project allows **junior** and **senior** users to manage transactions, hand
 - **Role-Based Access Control**: Different levels of access for junior and senior users.
 - **Alert System**: Generate alerts for mismatches and transaction-related issues.
 - **Statistics**: View statistics on transactions, mismatches, and senior user-specific data.
-- **Mismatch Summary**: Generate a summary of all detected mismatches.
+- **Mismatch Summary**: Generate a summary of all detected mismatches. 
 
 ## Technologies
  
