@@ -6,7 +6,7 @@ The **Transaction Verification & Reconciliation System** is a Spring Boot applic
 
 This project allows **junior** and **senior** users to manage transactions, handle mismatches, and perform reconciliation tasks. Senior users have additional privileges to view and compare data against external sources, retrieve stock information, and generate statistics.
 
-## Features
+## Features 
 
 - **Transaction Management**: Create, update, view, and delete transactions. 
 - **Reconciliation**: Verify transactions, detect mismatches, and compare with external sources.
